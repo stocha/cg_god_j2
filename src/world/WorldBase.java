@@ -21,7 +21,7 @@ public class WorldBase {
 
     public static final int world_width = 4000;
     public static final int world_height = 1800;
-    public static final int world_speed=100;
+    public static final int world_speed = 100;
     public static final int nb_turns = 200;
 
     public static interface WorldBot {
@@ -46,27 +46,27 @@ public class WorldBase {
          */
         public List<Point> outorders();
     }
-    
-    public static class BotDefault implements WorldBot{
-        
+
+    public static class BotDefault implements WorldBot {
+
         List<List<Point>> droneLinesPerPlayer;
         List<Point> orders;
-        int id=0;
+        int id = 0;
 
         @Override
         public void setup(int P, int Id, int D, int Z, List<Point> xyZ) {
-            orders=new ArrayList<>(D);
-            for(int d=0;d<D;d++){
+            orders = new ArrayList<>(D);
+            for (int d = 0; d < D; d++) {
                 orders.add(new Point());
             }
-            this.id=Id;
+            this.id = Id;
         }
 
         @Override
         public void turn(int[] zline, List<List<Point>> droneLinesPerPlayer) {
-            this.droneLinesPerPlayer=droneLinesPerPlayer;
-            for(int d=0;d<orders.size();d++){
-                orders.get(d).set(20+20*d+100*id, 20+300*id);
+            this.droneLinesPerPlayer = droneLinesPerPlayer;
+            for (int d = 0; d < orders.size(); d++) {
+                orders.get(d).set(20 + 20 * d + 100 * id, 20 + 300 * id);
             }
         }
 
@@ -109,7 +109,7 @@ public class WorldBase {
                 scores[p] = s.scores[p];
             }
             for (int z = 0; z < Z; z++) {
-                owners[z]=s.owners[z];
+                owners[z] = s.owners[z];
             }
         }
 
@@ -123,7 +123,7 @@ public class WorldBase {
     final List<Turn> turn;
     final Random rand;
 
-    public WorldBase(int D, int Z,long seed, WorldBot... bots) {
+    public WorldBase(int D, int Z, long seed, WorldBot... bots) {
         this.D = D;
         this.Z = Z;
         this.P = bots.length;
@@ -136,132 +136,139 @@ public class WorldBase {
         }
 
         this.turn = new ArrayList<>(nb_turns);
-        
-        this.rand=new Random(seed);
+
+        this.rand = new Random(seed);
     }
-    
-    public void genWorld(){
-        
+
+    public void genWorld() {
+
         turn.add(new Turn());
-        
-        for(int p=0;p<P;p++){
-            turn.get(turn.size()-1).owners[p]=-1;
+
+        for (int p = 0; p < P; p++) {
+            turn.get(turn.size() - 1).owners[p] = -1;
         }
-        
-        int i=0;
-        for(WorldBot b : bots){
+
+        int i = 0;
+        for (WorldBot b : bots) {
             b.setup(P, i++, D, Z, zones);
         }
-        
-        final int dec=400;
-        for(Point zz : zones){
-            zz.set(((rand.nextInt()&0xFFFF)%((int)world_width-dec)),((rand.nextInt()&0xFFFF)%(int)(world_height-dec)));
-            zz.x+=dec/2;
-            zz.y+=dec/2;
-        }
-        
-        for(Point d : turn.get(turn.size()-1).playerDrones.get(0)){
-            d.set(((rand.nextInt()&0xFFFF)%(int)(world_width-dec)),((rand.nextInt()&0xFFFF)%(int)(world_height-dec)));
-            d.x+=dec/2;
-            d.y+=dec/2;
-        }
-        for(int p=1;p<P;p++){
-            for(int d=0;d<D;d++){
-                turn.get(turn.size()-1).playerDrones.get(p).get(d).set(
-                        turn.get(turn.size()-1).playerDrones.get(0).get(d)
-                );
-            }
-        }
-    }
-    public boolean genTurn(){
-        int i=0;
-        Turn prev=turn.get(turn.size()-1);
-        Turn newt=new Turn();
-        newt.copy(prev);
-        
-        for(WorldBot b : bots){
-            Turn t=new Turn();
-            t.copy(turn.get(turn.size()-1));
-            
-            b.turn(turn.get(turn.size()-1).owners, t.playerDrones);
-        }   
-        
-        for(int p=0;p<P;p++){
-            List<Point> orders=bots.get(p).outorders();
-            for(int d=0;d<D;d++){
-                
-                newt.playerDrones.get(p).get(d).set(
-                prev.playerDrones.get(p).get(d).ABdirAtDistFromA(orders.get(d), world_speed)
-                );
-            }
-            
-        }
-        
-        turn.add(newt);        
-        return turn.size()<=200;
-    }
-    
-    public void doRun(){
-        while(genTurn()){}
-    }
-    
-    public void doRun(int nbTurn){
-        int cur=turn.size();
-        
-        while(genTurn() && turn.size()<nbTurn+cur){}
-    }    
 
-    
-    public String debug_turnAt(int num, double scale){
-        String res="";
-        int width=(int)(world_width*scale);
-        int height=(int)(world_height*scale);
-        
-        String[][] im=new String[width][height];
-        for(int i=0;i<height;i++){
-            for(int j=0;j<width;j++){
-                im[j][i]="--";
+        final int dec = 400;
+        for (Point zz : zones) {
+            zz.set(((rand.nextInt() & 0xFFFF) % ((int) world_width - dec)), ((rand.nextInt() & 0xFFFF) % (int) (world_height - dec)));
+            zz.x += dec / 2;
+            zz.y += dec / 2;
+        }
+
+        for (Point d : turn.get(turn.size() - 1).playerDrones.get(0)) {
+            d.set(((rand.nextInt() & 0xFFFF) % (int) (world_width - dec)), ((rand.nextInt() & 0xFFFF) % (int) (world_height - dec)));
+            d.x += dec / 2;
+            d.y += dec / 2;
+        }
+        for (int p = 1; p < P; p++) {
+            for (int d = 0; d < D; d++) {
+                turn.get(turn.size() - 1).playerDrones.get(p).get(d).set(
+                        turn.get(turn.size() - 1).playerDrones.get(0).get(d)
+                );
             }
         }
-        
-        for(int p=0;p<P;p++){
-            for(int d=0;d<D;d++){
-                int x=(int)(turn.get(num).playerDrones.get(p).get(d).x * scale);
-                int y=(int)(turn.get(num).playerDrones.get(p).get(d).y * scale);
-                int cp='0'+(char)p;
-                int cd='a'+(char)d;
-                
-            im[x][y]=""+(char)cp+(char)cd;
-                               
+    }
+
+    public boolean genTurn() {
+        int i = 0;
+        Turn prev = turn.get(turn.size() - 1);
+        Turn newt = new Turn();
+        newt.copy(prev);
+
+        for (WorldBot b : bots) {
+            Turn t = new Turn();
+            t.copy(turn.get(turn.size() - 1));
+
+            b.turn(turn.get(turn.size() - 1).owners, t.playerDrones);
+        }
+
+        for (int p = 0; p < P; p++) {
+            List<Point> orders = bots.get(p).outorders();
+            for (int d = 0; d < D; d++) {
+                Point old = prev.playerDrones.get(p).get(d);
+                Point dst = orders.get(d);
+                Point n = new Point();
+
+                if (old.dist(dst) <= world_speed) {
+                    newt.playerDrones.get(p).get(d).set(dst);
+                } else {
+                    newt.playerDrones.get(p).get(d).set(old.ABdirAtDistFromA(dst, world_speed));
+                }
+
+            }
+
+        }
+
+        turn.add(newt);
+        return turn.size() <= 200;
+    }
+
+    public void doRun() {
+        while (genTurn()) {
+        }
+    }
+
+    public void doRun(int nbTurn) {
+        int cur = turn.size();
+
+        while (genTurn() && turn.size() < nbTurn + cur) {
+        }
+    }
+
+    public String debug_turnAt(int num, double scale) {
+        String res = "";
+        int width = (int) (world_width * scale);
+        int height = (int) (world_height * scale);
+
+        String[][] im = new String[width][height];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                im[j][i] = "--";
             }
         }
-        
-        int z=0;
-        for(Point zz : zones){
-            int x=(int)(zz.x()*scale);
-            int y=(int)(zz.y()*scale);
-            char p='#';
-            
-            im[x][y]=""+p+((char)((char)'A'+(char)z));
-                    z++;
-        }
-        
-        for(int i=0;i<height;i++){
-            for(int j=0;j<width;j++){
-                res+= im[j][i];
+
+        for (int p = 0; p < P; p++) {
+            for (int d = 0; d < D; d++) {
+                int x = (int) (turn.get(num).playerDrones.get(p).get(d).x * scale);
+                int y = (int) (turn.get(num).playerDrones.get(p).get(d).y * scale);
+                int cp = '0' + (char) p;
+                int cd = 'a' + (char) d;
+
+                im[x][y] = "" + (char) cp + (char) cd;
+
             }
-            res+="\n";
         }
-        res+="\n";
-        
-        
-        res+="Turn "+num +" ";
-        for(int i=0;i<P;i++){
-            res+="/"+this.turn.get(num).owners[i];
+
+        int z = 0;
+        for (Point zz : zones) {
+            int x = (int) (zz.x() * scale);
+            int y = (int) (zz.y() * scale);
+            char p = '#';
+
+            im[x][y] = "" + p + ((char) ((char) 'A' + (char) z));
+            z++;
         }
-        for(int i=0;i<P;i++){
-            res+="|"+this.turn.get(num).scores[i];
-        }        
+
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                res += im[j][i];
+            }
+            res += "\n";
+        }
+        res += "\n";
+
+        res += "Turn " + num + " ";
+        for (int i = 0; i < P; i++) {
+            res += "/" + this.turn.get(num).owners[i];
+        }
+        for (int i = 0; i < P; i++) {
+            res += "|" + this.turn.get(num).scores[i];
+        }
         return res;
     }
 }
