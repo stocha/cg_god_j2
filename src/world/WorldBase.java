@@ -5,13 +5,13 @@
  */
 package world;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import tools.L0_2dLib.Point;
 
 /**
  *
@@ -71,8 +71,8 @@ public class WorldBase {
         public void copy(Turn s) {
             for (int p = 0; p < P; p++) {
                 for (int d = 0; d < D; d++) {
-                    playerDrones.get(p).get(d).setLocation(s.playerDrones.get(p).get(d));
-                    playerDronesOrders.get(p).get(d).setLocation(s.playerDronesOrders.get(p).get(d));
+                    playerDrones.get(p).get(d).set(s.playerDrones.get(p).get(d));
+                    playerDronesOrders.get(p).get(d).set(s.playerDronesOrders.get(p).get(d));
                 }
                 scores[p] = s.scores[p];
             }
