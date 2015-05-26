@@ -29,21 +29,41 @@ public class WorldBase {
          *
          * @param xyZ Z*2 int (x,y)
          */
-        public void setup(int P, int Id, int D, int Z, Stream<Integer> xyZ);
+        public void setup(int P, int Id, int D, int Z, List<Point> xyZ);
 
         /**
          *
          * @param zline Z int (owner)
-         * @param droneLines P*D*2 p-> d->int (x,y)
+         * @param droneLinesPerPlayer P*D*2 p-> d->int (x,y)
          */
-        public void turn(IntStream zline, IntStream droneLines);
+        public void turn(int[] zline, List<Point> droneLinesPerPlayer);
 
         /**
          * D*2 int (x,y)
          *
          * @return
          */
-        public IntStream outorders();
+        public List<Point> outorders();
+    }
+    
+    public static class BotDefault implements WorldBot{
+        
+        List<Point> droneLines;
+
+        @Override
+        public void setup(int P, int Id, int D, int Z, List<Point> xyZ) {
+            
+        }
+
+        @Override
+        public void turn(int[] zline, List<Point> droneLinesPerPlayer) {
+            this.droneLines=droneLinesPerPlayer;
+        }
+
+        @Override
+        public List<Point> outorders() {
+            return this.droneLines;
+        }
     }
 
     private class Turn {
@@ -63,6 +83,8 @@ public class WorldBase {
                     dr.add(new Point(0, 0));
                     or.add(new Point(0, 0));
                 }
+                playerDrones.add(dr);
+                playerDronesOrders.add(or);
             }
             owners = new int[Z];
             scores = new int[P];
@@ -109,10 +131,90 @@ public class WorldBase {
     }
     
     public void genWorld(){
+        
+        turn.add(new Turn());
+        
+        for(int p=0;p<P;p++){
+            turn.get(turn.size()-1).owners[p]=-1;
+        }
+        
+        int i=0;
+        for(WorldBot b : bots){
+            b.setup(P, i++, D, Z, zones);
+        }
+        
+        final int dec=400;
+        for(Point zz : zones){
+            zz.set(((rand.nextInt()&0xFFFF)%((int)world_width-dec)),((rand.nextInt()&0xFFFF)%(int)(world_height-dec)));
+            zz.x+=dec/2;
+            zz.y+=dec/2;
+        }
+        
+        for(Point d : turn.get(turn.size()-1).playerDrones.get(0)){
+            d.set(((rand.nextInt()&0xFFFF)%(int)(world_width-dec)),((rand.nextInt()&0xFFFF)%(int)(world_height-dec)));
+            d.x+=dec/2;
+            d.y+=dec/2;
+        }
     }
     public boolean genTurn(){
+        int i=0;
+        for(WorldBot b : bots){
+            b.turn(turn.get(turn.size()-1).owners, turn.get(turn.size()-1).playerDrones.get(i++));
+        }        
         
-        return turn.size()<200;
+        return turn.size()<=200;
     }
+    
+    public void doRun(){
+        while(genTurn()){}
+    }
+    
+    public void doRun(int nbTurn){
+        while(genTurn() && turn.size()<=nbTurn){}
+    }    
 
+    
+    public String debug_turnAt(int num, double scale){
+        String res="";
+        int width=(int)(world_width*scale);
+        int height=(int)(world_height*scale);
+        
+        String[][] im=new String[width][height];
+        for(int i=0;i<height;i++){
+            for(int j=0;j<width;j++){
+                im[j][i]="--";
+            }
+        }
+        
+        for(int p=0;p<P;p++){
+            for(int d=0;d<D;d++){
+                int x=(int)(turn.get(num).playerDrones.get(p).get(d).x * scale);
+                int y=(int)(turn.get(num).playerDrones.get(p).get(d).y * scale);
+                int cp='0'+(char)p;
+                int cd='a'+(char)d;
+                
+            im[x][y]=""+(char)cp+(char)cd;
+                               
+            }
+        }
+        
+        int z=0;
+        for(Point zz : zones){
+            int x=(int)(zz.x()*scale);
+            int y=(int)(zz.y()*scale);
+            char p='#';
+            
+            im[x][y]=""+p+((char)((char)'A'+(char)z));
+                    z++;
+        }
+        
+        for(int i=0;i<height;i++){
+            for(int j=0;j<width;j++){
+                res+= im[j][i];
+            }
+            res+="\n";
+        }
+        res+="\n";
+        return res;
+    }
 }

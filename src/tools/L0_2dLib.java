@@ -22,8 +22,8 @@ public class L0_2dLib {
     }    
     
     public static class Point implements WithCoord {
-        double x;
-        double y;
+        public double x;
+        public double y;
         
         public Point(){
         }
@@ -31,6 +31,13 @@ public class L0_2dLib {
         public Point(WithCoord c){
             set(c);
         }
+
+        @Override
+        public String toString() {
+            return "Point{" + "" + x + "," + y + '}';
+        }
+        
+        
         
         public Point(double x, double y){
             set(x,y);
