@@ -39,9 +39,14 @@ public class WorldTest {
     @Test
     public void testIt(){
         System.err.println("testing");
-        WorldBase w=new WorldBase(3, 5, 32, new WorldBase.BotDefault(),new WorldBase.BotDefault());
+        WorldBase w=new WorldBase(3, 5, 9937777, new WorldBase.BotDefault(),new WorldBase.BotDefault());
         w.genWorld();
         
-        System.err.println(""+w.debug_turnAt(0, 0.01));
+        int nbturn=20;
+        int pas=0;
+        for(int i=0;i<nbturn;i++){
+            System.err.println(""+w.debug_turnAt(i, 0.01));
+            w.genTurn();
+        }
     }
 }

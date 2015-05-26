@@ -21,6 +21,7 @@ public class WorldBase {
 
     public static final int world_width = 4000;
     public static final int world_height = 1800;
+    public static final int world_speed=100;
     public static final int nb_turns = 200;
 
     public static interface WorldBot {
@@ -36,7 +37,7 @@ public class WorldBase {
          * @param zline Z int (owner)
          * @param droneLinesPerPlayer P*D*2 p-> d->int (x,y)
          */
-        public void turn(int[] zline, List<Point> droneLinesPerPlayer);
+        public void turn(int[] zline, List<List<Point>> droneLinesPerPlayer);
 
         /**
          * D*2 int (x,y)
@@ -48,21 +49,30 @@ public class WorldBase {
     
     public static class BotDefault implements WorldBot{
         
-        List<Point> droneLines;
+        List<List<Point>> droneLinesPerPlayer;
+        List<Point> orders;
+        int id=0;
 
         @Override
         public void setup(int P, int Id, int D, int Z, List<Point> xyZ) {
-            
+            orders=new ArrayList<>(D);
+            for(int d=0;d<D;d++){
+                orders.add(new Point());
+            }
+            this.id=Id;
         }
 
         @Override
-        public void turn(int[] zline, List<Point> droneLinesPerPlayer) {
-            this.droneLines=droneLinesPerPlayer;
+        public void turn(int[] zline, List<List<Point>> droneLinesPerPlayer) {
+            this.droneLinesPerPlayer=droneLinesPerPlayer;
+            for(int d=0;d<orders.size();d++){
+                orders.get(d).set(20+20*d+100*id, 20+300*id);
+            }
         }
 
         @Override
         public List<Point> outorders() {
-            return this.droneLines;
+            return orders;
         }
     }
 
@@ -155,13 +165,39 @@ public class WorldBase {
             d.x+=dec/2;
             d.y+=dec/2;
         }
+        for(int p=1;p<P;p++){
+            for(int d=0;d<D;d++){
+                turn.get(turn.size()-1).playerDrones.get(p).get(d).set(
+                        turn.get(turn.size()-1).playerDrones.get(0).get(d)
+                );
+            }
+        }
     }
     public boolean genTurn(){
         int i=0;
-        for(WorldBot b : bots){
-            b.turn(turn.get(turn.size()-1).owners, turn.get(turn.size()-1).playerDrones.get(i++));
-        }        
+        Turn prev=turn.get(turn.size()-1);
+        Turn newt=new Turn();
+        newt.copy(prev);
         
+        for(WorldBot b : bots){
+            Turn t=new Turn();
+            t.copy(turn.get(turn.size()-1));
+            
+            b.turn(turn.get(turn.size()-1).owners, t.playerDrones);
+        }   
+        
+        for(int p=0;p<P;p++){
+            List<Point> orders=bots.get(p).outorders();
+            for(int d=0;d<D;d++){
+                
+                newt.playerDrones.get(p).get(d).set(
+                prev.playerDrones.get(p).get(d).ABdirAtDistFromA(orders.get(d), world_speed)
+                );
+            }
+            
+        }
+        
+        turn.add(newt);        
         return turn.size()<=200;
     }
     
@@ -170,7 +206,9 @@ public class WorldBase {
     }
     
     public void doRun(int nbTurn){
-        while(genTurn() && turn.size()<=nbTurn){}
+        int cur=turn.size();
+        
+        while(genTurn() && turn.size()<nbTurn+cur){}
     }    
 
     
@@ -215,6 +253,15 @@ public class WorldBase {
             res+="\n";
         }
         res+="\n";
+        
+        
+        res+="Turn "+num +" ";
+        for(int i=0;i<P;i++){
+            res+="/"+this.turn.get(num).owners[i];
+        }
+        for(int i=0;i<P;i++){
+            res+="|"+this.turn.get(num).scores[i];
+        }        
         return res;
     }
 }
