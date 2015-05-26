@@ -23,6 +23,7 @@ public class WorldBase {
     public static final int world_height = 1800;
     public static final int world_speed = 100;
     public static final int nb_turns = 200;
+    public static final int world_ctdist= 100;
 
     public static interface WorldBot {
 
@@ -47,7 +48,7 @@ public class WorldBase {
         public List<Point> outorders();
     }
 
-    public static class BotDefault implements WorldBot {
+    public static class BotLost implements WorldBot {
 
         List<List<Point>> droneLinesPerPlayer;
         List<Point> orders;
@@ -75,6 +76,44 @@ public class WorldBase {
             return orders;
         }
     }
+    
+    
+public static class BotSwarm implements WorldBot {
+
+        List<List<Point>> droneLinesPerPlayer;
+        List<Point> orders;
+        List<Point> xyZ;
+        int[] zline;
+        int id = 0;
+
+        @Override
+        public void setup(int P, int Id, int D, int Z, List<Point> xyZ) {
+            orders = new ArrayList<>(D);
+            for (int d = 0; d < D; d++) {
+                orders.add(new Point());
+            }
+            this.id = Id;
+            this.xyZ=xyZ;
+        }
+
+        @Override
+        public void turn(int[] zline, List<List<Point>> droneLinesPerPlayer) {
+            this.droneLinesPerPlayer = droneLinesPerPlayer;
+            for(int i=0;i<zline.length;i++){
+                if(zline[i]!=id){
+                    for (int d = 0; d < orders.size(); d++) {
+                        orders.get(d).set(xyZ.get(i));
+                    }                    
+                }
+            }
+           
+        }
+
+        @Override
+        public List<Point> outorders() {
+            return orders;
+        }
+    }    
 
     private class Turn {
 
@@ -144,7 +183,7 @@ public class WorldBase {
 
         turn.add(new Turn());
 
-        for (int p = 0; p < P; p++) {
+        for (int p = 0; p < Z; p++) {
             turn.get(turn.size() - 1).owners[p] = -1;
         }
 
@@ -179,6 +218,14 @@ public class WorldBase {
         Turn prev = turn.get(turn.size() - 1);
         Turn newt = new Turn();
         newt.copy(prev);
+        
+        List<List<Integer>> zonePlayCount=new ArrayList<>(Z);
+        for(int z=0;z<Z;z++){
+            zonePlayCount.add(new ArrayList<>(P));
+            for(int p=0;p<P;p++){
+                zonePlayCount.get(z).add(0);
+            }
+        }
 
         for (WorldBot b : bots) {
             Turn t = new Turn();
@@ -195,15 +242,48 @@ public class WorldBase {
                 Point n = new Point();
 
                 if (old.dist(dst) <= world_speed) {
-                    newt.playerDrones.get(p).get(d).set(dst);
+                    n.set(dst);
                 } else {
-                    newt.playerDrones.get(p).get(d).set(old.ABdirAtDistFromA(dst, world_speed));
+                    n.set(old.ABdirAtDistFromA(dst, world_speed));
+                }
+                
+                newt.playerDrones.get(p).get(d).set(n);
+                for(int z=0;z<Z;z++){
+                    if(n.dist(zones.get(z))<=world_ctdist){
+                        zonePlayCount.get(z).set(zonePlayCount.get(z).get(p)+1,p);
+                    }
                 }
 
             }
 
         }
-
+        for(int z=0;z<Z;z++){
+            
+            int max=Integer.MIN_VALUE;
+            for(int p=0;p<P;p++){
+                if(zonePlayCount.get(z).get(p)> max){
+                    max=zonePlayCount.get(z).get(p);
+                }
+            }
+            
+            int countMax=0;
+            int maxInd=-1;
+            for(int p=0;p<P;p++){
+                if(zonePlayCount.get(z).get(p)== max){
+                    countMax++;
+                    maxInd=p;
+                }
+            }            
+            if(countMax==1){
+                newt.owners[z]=maxInd;
+            }
+            
+        }        
+        
+        for(int z=0;z<Z;z++){
+            int own=newt.owners[z];
+            if(own!=-1) newt.scores[own]++;
+        }
         turn.add(newt);
         return turn.size() <= 200;
     }
@@ -263,7 +343,7 @@ public class WorldBase {
         res += "\n";
 
         res += "Turn " + num + " ";
-        for (int i = 0; i < P; i++) {
+        for (int i = 0; i < Z; i++) {
             res += "/" + this.turn.get(num).owners[i];
         }
         for (int i = 0; i < P; i++) {

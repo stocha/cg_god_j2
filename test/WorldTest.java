@@ -39,10 +39,10 @@ public class WorldTest {
     @Test
     public void testIt(){
         System.err.println("testing");
-        WorldBase w=new WorldBase(3, 5, 9937777, new WorldBase.BotDefault(),new WorldBase.BotDefault());
+        WorldBase w=new WorldBase(3, 5, 9937777, new WorldBase.BotSwarm(),new WorldBase.BotLost());
         w.genWorld();
         
-        int nbturn=20;
+        int nbturn=40;
         int pas=0;
         for(int i=0;i<nbturn;i++){
             System.err.println(""+w.debug_turnAt(i, 0.01));
