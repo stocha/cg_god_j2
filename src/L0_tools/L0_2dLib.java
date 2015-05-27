@@ -34,7 +34,7 @@ public class L0_2dLib {
 
         @Override
         public String toString() {
-            return "{" + "" + x + "," + y + '}';
+            return "{" + "" + (int)x + "," + (int)y + '}';
         }
         
         

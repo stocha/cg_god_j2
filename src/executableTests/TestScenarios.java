@@ -5,6 +5,7 @@ import L1_bots.L1_botStruct;
 import L1_bots.TestL1_SwarmBot;
 import java.util.List;
 import L0_tools.L0_2dLib;
+import L1_bots.TestL1_GreedyBot;
 import world.WorldBase;
 import static world.WorldVisu.create;
 
@@ -19,6 +20,43 @@ import static world.WorldVisu.create;
  * @author Jahan
  */
 public class TestScenarios {
+    
+    final static int NBTURNS=10;
+    
+    public static class TesterBot implements WorldBase.WorldBot{
+        
+        final L1_botStruct.BotBridge br;
+        
+        TesterBot(L1_botStruct.BotFactory fact){
+            br=new L1_botStruct.BotBridgeImpl(fact);        
+        }
+
+            @Override
+            public void setup(int P, int Id, int D, int Z, List<L0_2dLib.Point> xyZ) {
+                //System.err.println("Wrapper setup exec "+xyZ);
+                br.setup(P, Id, D, Z, xyZ);
+                
+            }
+
+            @Override
+            public void turn(int[] zline, List<List<L0_2dLib.Point>> droneLinesPerPlayer) {
+                br.turn(zline, droneLinesPerPlayer);
+            }
+
+            @Override
+            public List<L0_2dLib.Point> outorders() {
+                //System.err.println("Wrapper outorders exec");
+                List<L0_2dLib.Point> res=br.outorders();
+                //System.err.println("Wrapper outorders exec "+res);
+                return res;
+            }
+
+            @Override
+            public String botName() {
+                return ""+br.botName();
+            }        
+        
+    }
     
     
     public static void testVisu(){
@@ -74,10 +112,10 @@ public class TestScenarios {
             }
         };
         
-        WorldBase w=new WorldBase(3, 5, 9937777,brii,new WorldBase.TranquilleBot(), new WorldBase.BotSwarm());
+        WorldBase w=new WorldBase(3, 5, 9937777,brii,new TesterBot(TestL1_GreedyBot.fact), new WorldBase.BotSwarm());
         w.genWorld();
         
-        int nbturn=200;
+        int nbturn=NBTURNS;
         int pas=0;
         
         Thread genIt=new Thread(){
