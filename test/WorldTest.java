@@ -3,12 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import L1_bots.L1_botStruct;
+import L1_bots.TestL1_GreedyBot;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import world.WorldBase;
 
 /**
@@ -49,4 +50,30 @@ public class WorldTest {
             w.genTurn();
         }
     }
+    
+    /**
+     * Reader from input stream / output
+     * @param args 
+     */
+    public static void main(String[] args) {
+        L1_botStruct.BotBridgeGodIn theBot=new L1_botStruct.BotBridgeGodIn(System.in, TestL1_GreedyBot.fact);
+        
+        
+        double maxT=0;
+
+        while (true) {
+            long t0 = System.currentTimeMillis();
+            theBot.readTurn();
+            theBot.writeOrders(System.out);
+
+            long t1 = System.currentTimeMillis();
+            double t = t1 - t0;
+            if(maxT <t) maxT=t;
+            System.err.println("------------------------------");
+            System.err.println("temps mili " + t+" maxT "+maxT);
+            System.gc();
+        }
+
+    }        
+    
 }
