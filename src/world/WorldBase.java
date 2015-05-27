@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import tools.L0_2dLib.Point;
+import L0_tools.L0_2dLib.Point;
 
 /**
  *
@@ -46,6 +46,8 @@ public class WorldBase {
          * @return
          */
         public List<Point> outorders();
+        
+        public String botName();
     }
 
     public static class BotLost implements WorldBot {
@@ -74,6 +76,11 @@ public class WorldBase {
         @Override
         public List<Point> outorders() {
             return orders;
+        }
+
+        @Override
+        public String botName() {
+            return this.getClass().getSimpleName();
         }
     }
     
@@ -105,6 +112,11 @@ public class WorldBase {
         public List<Point> outorders() {
             return orders;
         }
+        
+        @Override
+        public String botName() {
+            return this.getClass().getSimpleName();
+        }        
     }    
     
     
@@ -143,6 +155,11 @@ public static class BotSwarm implements WorldBot {
         public List<Point> outorders() {
             return orders;
         }
+        
+        @Override
+        public String botName() {
+            return this.getClass().getSimpleName();
+        }        
     }    
 
     public class Turn {

@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package bots;
+package L1_bots;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import tools.L0_2dLib;
+import L0_tools.L0_2dLib;
 
 /**
  *
@@ -20,7 +20,11 @@ public class L1_botStruct {
 
         /**
          *
+         * @param P
+         * @param Id
          * @param xyZ Z*2 int (x,y)
+         * @param Z
+         * @param D
          */
         public void setup(int P, int Id, int D, int Z, List<L0_2dLib.Point> xyZ);
 
@@ -45,13 +49,15 @@ public class L1_botStruct {
 
     public static class BotBase {        
         
-        public class ZoneBase implements L0_2dLib.WithCoord{
+        public class Zone implements L0_2dLib.WithCoord{
             final int id;
             final L0_2dLib.Point cor;
+            Player owner;
 
-            public ZoneBase(int id,L0_2dLib.Point cor) {
+            public Zone(int id,Player owner) {
                 this.id = id;
-                this.cor=new L0_2dLib.Point(cor);
+                this.cor=new L0_2dLib.Point();
+                this.owner=owner;
             }
 
             public String toString() {
@@ -86,13 +92,13 @@ public class L1_botStruct {
             
         }
         
-        public class DroneBase implements L0_2dLib.WithCoord{
+        public class Drone implements L0_2dLib.WithCoord{
             final int id;
-            final PlayerBase owner;
+            final Player owner;
             
             final L0_2dLib.Point cor;
 
-            public DroneBase(PlayerBase owner,int id) {
+            public Drone(Player owner,int id) {
                 this.owner=owner;
                 this.id = id;
                 this.cor=new L0_2dLib.Point();
@@ -129,32 +135,31 @@ public class L1_botStruct {
             }
         }
         
-        public class PlayerBase{
+        public class Player{
             final int id;
+            int score=0;
 
-            public PlayerBase(int id) {
+            public Player(int id) {
                 this.id = id;
             }
             
             
         }        
         
-        public class Score{
-            int score=0;
-        }
-
         
         final int P;
         final int Id;
         final int D;
         final int Z;
         
-        final PlayerBase _nullPlayer=new PlayerBase(-1);
-        final PlayerBase _me;
-        final List<PlayerBase> _player;
-        final HashMap<PlayerBase,List<DroneBase>> _drone;
-        final HashMap<PlayerBase,Score> _score;
-        final HashMap<PlayerBase,List<ZoneBase>> _controled;
+        final Player _nullPlayer=new Player(-1);
+        final Player _me;
+        final List<Player> _player;
+        final List<Zone> _zone;
+        final HashMap<Player,List<Drone>> _drone;
+        final HashMap<Player,List<Zone>> _controled;
+        final HashMap<Drone,L0_2dLib.Point> _order;
+        private final List<L0_2dLib.Point> res;     
 
         public BotBase(int P, int Id, int D, int Z) {
             this.P = P;
@@ -164,16 +169,21 @@ public class L1_botStruct {
             
             _player =new ArrayList<>(P);
             for(int p=0;p<P;p++){
-                _player.add(new PlayerBase(p));
+                _player.add(new Player(p));
             }
             _me=_player.get(Id);
             
+            _zone =new ArrayList<>(Z);
+            for(int z=0;z<Z;z++){
+                _zone.add(new Zone(z,_nullPlayer));
+            }            
+            
             _drone=new HashMap<>(P);            
             
-            for(PlayerBase p : _player){
-                List<DroneBase> bbl=new ArrayList<>(D);
+            for(Player p : _player){
+                List<Drone> bbl=new ArrayList<>(D);
                 for(int d=0;d<D;d++){
-                    DroneBase bb=new DroneBase(p, d);
+                    Drone bb=new Drone(p, d);
                     bbl.add(bb);
                 }
                 _drone.put(p,bbl);
@@ -181,20 +191,40 @@ public class L1_botStruct {
             }
             
             _controled=new HashMap<>(P);
-            _score=new HashMap<>(P);
-            for(PlayerBase p : _player){
-                _controled.put(p, new ArrayList<>(Z));
-                _score.put(p, new Score());
+            for(Player p : _player){
+                _controled.put(p, new ArrayList<>());
+            }
+            _controled.put(_nullPlayer, new ArrayList<>());
+            
+            _order=new HashMap<>(D);
+            for(Drone d : _drone.get(_me)){
+                _order.put(d, new L0_2dLib.Point());
+            }
+            
+            res=new ArrayList<>(D);
+            for(int d=0;d<D;d++){
+                res.add(new L0_2dLib.Point());
             }
         }
         
         public void inputZones( List<L0_2dLib.Point> xyZ){
-            
+            for(Zone z : _zone){
+                z.cor.set(xyZ.get(z.id));
+                System.err.println("Inputing zone "+z+" from"+xyZ);
+            }
             
         }
         
         public void inputTurnZonesOwner(int[] owners){
-            
+            for(Player p : _player){
+                _controled.get(p).clear();
+            }
+            for(Zone z : _zone){
+                if(owners[z.id]==-1) z.owner=_nullPlayer;
+                else z.owner=_player.get(owners[z.id]);
+                
+                _controled.get(z.owner).add(z);
+            }            
         }        
         
         public void inputTurnPlayerBot(int p,List<L0_2dLib.Point> xyZ){
@@ -203,11 +233,16 @@ public class L1_botStruct {
         
         
         public List<L0_2dLib.Point> outorders(){
-            return null;
+
+            for(Drone d : _drone.get(_me)){
+                res.set(d.id, _order.get(d));
+            }
+            
+            return res;
         }
-        
-        
-        
+  
+    }
+    
         public static class BotBridgeImpl implements BotBridge {
             
             final BotFactory fact;
@@ -221,7 +256,8 @@ public class L1_botStruct {
             
             @Override
             public void setup(int P, int Id, int D, int Z, List<L0_2dLib.Point> xyZ) {
-                fact.alloc(P, Id, D, Z);
+                bot=fact.alloc(P, Id, D, Z);
+                bot.inputZones(xyZ);
             }
 
             @Override
@@ -238,8 +274,5 @@ public class L1_botStruct {
             public List<L0_2dLib.Point> outorders() {
                 return bot.outorders();
             }
-        }
-        
-        
-    }
+        }    
 }

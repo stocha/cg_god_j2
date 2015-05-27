@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import tools.L0_2dLib;
+import L0_tools.L0_2dLib;
 
 /**
  *
@@ -42,7 +42,7 @@ public class WorldVisu {
         double ys=0;
         
         
-        final Color pcol[]=new Color[]{java.awt.Color.GRAY,java.awt.Color.BLUE,java.awt.Color.RED,java.awt.Color.GREEN};
+        final Color pcol[]=new Color[]{java.awt.Color.GREEN,java.awt.Color.BLUE,java.awt.Color.RED,java.awt.Color.WHITE,java.awt.Color.YELLOW};
 
         public View(WorldBase w) {
             this.w = w;
@@ -133,7 +133,7 @@ public class WorldVisu {
         public void paint(Graphics g) {
             super.paint(g); //To change body of generated methods, choose Tools | Templates.
             
-            g.setColor(java.awt.Color.lightGray);
+            g.setColor(java.awt.Color.BLACK);
             g.fillRect(0, 0, this.getWidth(), this.getHeight());
             
             int ox=(int)(xs);
@@ -211,13 +211,13 @@ public class WorldVisu {
             JPanel right=new JPanel();
             right.setLayout(new GridLayout(0,2));
             right.add(new JLabel("Turn"));
-            JLabel numTurn=new JLabel("000000000000000");
+            JLabel numTurn=new JLabel("0000000");
             right.add(numTurn);
               
             JLabel lab[]=new JLabel[w.P*2];
             for(int i=0;i<w.P;i++){
-                lab[i*2]=new JLabel(w.bots.get(i).getClass().getSimpleName());
-                lab[i*2+1]=new JLabel(w.bots.get(i).getClass().getSimpleName());
+                lab[i*2]=new JLabel(w.bots.get(i).botName());
+                lab[i*2+1]=new JLabel(w.bots.get(i).botName());
                 right.add(lab[i*2]);right.add(lab[i*2 +1]);
             }
             
@@ -239,7 +239,7 @@ public class WorldVisu {
 
                     
                     for(int i=0;i<w.P;i++){
-                        String bn=""+w.bots.get(i).getClass().getSimpleName();
+                        String bn=""+w.bots.get(i).botName();
                         lab[i*2+1].setText(bn);
                     }
                     

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package tools;
+package L0_tools;
 
 import java.awt.Point;
 
@@ -34,7 +34,7 @@ public class L0_2dLib {
 
         @Override
         public String toString() {
-            return "Point{" + "" + x + "," + y + '}';
+            return "{" + "" + x + "," + y + '}';
         }
         
         
