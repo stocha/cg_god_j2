@@ -178,13 +178,19 @@ public class WorldVisu {
                 g.fillOval(ox+x-zoneradius, oy+y-zoneradius, zoneradius*2, zoneradius*2);
                 g.drawString(zs,ox+ x-zoneradius,oy+ y-zoneradius);
                 
+                    g.setColor(Color.DARK_GRAY);
+                    for(int i=2;i<10;i++){
+                        g.drawOval(ox+x-zoneradius*i, oy+y-zoneradius*i, zoneradius*i*2, zoneradius*i*2);
+                    }                
+                
+                
                     g.setColor(java.awt.Color.darkGray);
                     g.fillRect(ox+(20*(0)) +x-zoneradius +15,oy+ y-15,55,20);                
                 for(int p=0;p<w.P;p++){
 
 
                     g.setColor(pcol[p]);
-                    g.drawString(""+w.turn.get(currTurn).zonePlayCount.get(z).get(p),ox+(20*(p+1)) +x-zoneradius,oy+ y);
+                    g.drawString(""+w.turn.get(currTurn).zonePlayCount.get(z).get(p),ox+(20*(p+1)) +x-zoneradius,oy+ y);                    
                 }
                 
                                 z++;

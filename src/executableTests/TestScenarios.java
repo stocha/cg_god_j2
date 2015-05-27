@@ -112,7 +112,7 @@ public class TestScenarios {
             }
         };
         
-        WorldBase w=new WorldBase(3, 5, 9937777,brii,new TesterBot(TestL1_GreedyBot.fact), new WorldBase.BotSwarm());
+        WorldBase w=new WorldBase(10, 5, 9937777,brii,new TesterBot(TestL1_GreedyBot.fact), new WorldBase.BotSwarm());
         w.genWorld();
         
         int nbturn=NBTURNS;
