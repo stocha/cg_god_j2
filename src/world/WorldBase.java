@@ -130,6 +130,8 @@ public static class BotSwarm implements WorldBot {
 
         @Override
         public void setup(int P, int Id, int D, int Z, List<Point> xyZ) {
+            //System.err.println("BotSwarm setup "+xyZ);
+            
             orders = new ArrayList<>(D);
             for (int d = 0; d < D; d++) {
                 orders.add(new Point());
@@ -243,12 +245,7 @@ public static class BotSwarm implements WorldBot {
         for (int p = 0; p < Z; p++) {
             turn.get(turn.size() - 1).owners[p] = -1;
         }
-
-        int i = 0;
-        for (WorldBot b : bots) {
-            b.setup(P, i++, D, Z, zones);
-        }
-
+        
         final int dec = 400;
         for (Point zz : zones) {
             zz.set(((rand.nextInt() & 0xFFFF) % ((int) world_width - dec)), ((rand.nextInt() & 0xFFFF) % (int) (world_height - dec)));
@@ -267,7 +264,14 @@ public static class BotSwarm implements WorldBot {
                         turn.get(turn.size() - 1).playerDrones.get(0).get(d)
                 );
             }
+        }        
+
+        int i = 0;
+        for (WorldBot b : bots) {
+            b.setup(P, i++, D, Z, zones);
         }
+
+
     }
 
     public boolean genTurn() {

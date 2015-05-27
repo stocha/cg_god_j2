@@ -210,7 +210,7 @@ public class L1_botStruct {
         public void inputZones( List<L0_2dLib.Point> xyZ){
             for(Zone z : _zone){
                 z.cor.set(xyZ.get(z.id));
-                System.err.println("Inputing zone "+z+" from"+xyZ);
+                //System.err.println("Inputing zone "+z+" from"+xyZ);
             }
             
         }

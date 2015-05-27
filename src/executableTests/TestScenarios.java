@@ -51,6 +51,7 @@ public class TestScenarios {
 
             @Override
             public void setup(int P, int Id, int D, int Z, List<L0_2dLib.Point> xyZ) {
+                //System.err.println("Wrapper setup exec "+xyZ);
                 br.setup(P, Id, D, Z, xyZ);
             }
 
@@ -62,8 +63,9 @@ public class TestScenarios {
             @Override
             public List<L0_2dLib.Point> outorders() {
                 //System.err.println("Wrapper outorders exec");
-                
-                return br.outorders();
+                List<L0_2dLib.Point> res=br.outorders();
+                //System.err.println("Wrapper outorders exec "+res);
+                return res;
             }
 
             @Override
@@ -75,7 +77,7 @@ public class TestScenarios {
         WorldBase w=new WorldBase(3, 5, 9937777,brii,new WorldBase.TranquilleBot(), new WorldBase.BotSwarm());
         w.genWorld();
         
-        int nbturn=3;
+        int nbturn=200;
         int pas=0;
         
         Thread genIt=new Thread(){
@@ -91,7 +93,7 @@ public class TestScenarios {
         };        
         genIt.start();
         
-        //create(w);                
+        create(w);                
         
     }
     
