@@ -11,6 +11,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,16 +34,76 @@ public class WorldVisu {
         
         final WorldBase w;
         int currTurn=0;
-        double scale=0.4;
-        int droneRadius=5;
+        double scale=0.5;
+        int droneRadius=4;
+        
+        double xs=0;
+        double ys=0;
+        
         
         final Color pcol[]=new Color[]{java.awt.Color.GRAY,java.awt.Color.BLUE,java.awt.Color.RED,java.awt.Color.GREEN};
 
         public View(WorldBase w) {
             this.w = w;
             
-            double scaleScree=0.4;
+            double scaleScree=scale;
             this.setPreferredSize(new Dimension((int)(4000*scaleScree), (int)(1800*scaleScree)));
+            
+            this.addMouseWheelListener(new MouseWheelListener() {
+
+                @Override
+                public void mouseWheelMoved(MouseWheelEvent mwe) {
+                    int cli=mwe.getWheelRotation();
+                    if(cli>0){
+                        for(int i=0;i<cli;i++){
+                            double pcenterx=scale*(WorldBase.world_width/2.0);           
+                            double pcentery=scale*(WorldBase.world_height/2.0);    
+                            scale*=1.10;
+                            double ncenterx=scale*(WorldBase.world_width/2.0);       
+                            double ncentery=scale*(WorldBase.world_height/2.0); 
+                            xs-=ncenterx-pcenterx;
+                            ys-=ncentery-pcentery;
+
+                        }
+                    }else
+                    {
+                        cli=-cli;
+                        for(int i=0;i<cli;i++){
+                            double pcenterx=scale*(WorldBase.world_width/2.0);           
+                            double pcentery=scale*(WorldBase.world_height/2.0);                                                                     
+                            scale*=0.9;
+                            double ncenterx=scale*(WorldBase.world_width/2.0);       
+                            double ncentery=scale*(WorldBase.world_height/2.0);      
+                            xs-=ncenterx-pcenterx;
+                            ys-=ncentery-pcentery;                 
+                        }
+                    }
+                    repaint();
+                }
+            });
+            
+            this.addMouseMotionListener(new MouseMotionListener() {
+                
+                int lastx=0;
+                int lasty=0;
+
+                @Override
+                public void mouseDragged(MouseEvent me) {
+                    xs+=me.getX()-lastx;
+                    ys+=me.getY()-lasty;
+                    
+                    lastx=me.getX();
+                    lasty=me.getY();                    
+                    
+                    repaint();
+                }
+
+                @Override
+                public void mouseMoved(MouseEvent me) {
+                    lastx=me.getX();
+                    lasty=me.getY();
+                }
+            });
         }
         
         public void nextTurn(){
@@ -71,13 +135,15 @@ public class WorldVisu {
             g.setColor(java.awt.Color.lightGray);
             g.fillRect(0, 0, this.getWidth(), this.getHeight());
             
+            int ox=(int)(xs);
+            int oy=(int)(ys);
             
             int z = 0;
             g.setColor(java.awt.Color.darkGray);
             for (L0_2dLib.Point zz : w.zones) {
                 int x = (int) (zz.x() * scale);
                 int y = (int) (zz.y() * scale);
-                int zoneradius=(int)((WorldBase.world_ctdist*scale)/2);
+                int zoneradius=(int)((WorldBase.world_ctdist*scale));
                 char p = '#';
                 
                 int owner=w.turn.get(currTurn).owners[z];
@@ -92,8 +158,8 @@ public class WorldVisu {
                 String zs = "" + p + ((char) ((char) 'A' + (char) z));
                 z++;
                 
-                g.fillOval(x-zoneradius, y-zoneradius, zoneradius*2, zoneradius*2);
-                g.drawString(zs, x-zoneradius, y-zoneradius);
+                g.fillOval(ox+x-zoneradius, oy+y-zoneradius, zoneradius*2, zoneradius*2);
+                g.drawString(zs,ox+ x-zoneradius,oy+ y-zoneradius);
             }            
             
         for (int p = 0; p < w.P; p++) {
@@ -104,8 +170,8 @@ public class WorldVisu {
                 int cp = '0' + (char) p;
                 int cd = 'a' + (char) d;
                 
-                g.fillOval(x-droneRadius, y-droneRadius, droneRadius*2, droneRadius*2);
-                g.drawString("" + (char) cp + (char) cd, x-droneRadius, y-droneRadius);
+                g.fillOval(ox + x-droneRadius, oy+ y-droneRadius, droneRadius*2, droneRadius*2);
+                g.drawString("" + (char) cp + (char) cd,ox+ x-droneRadius, oy+ y-droneRadius);
 
                 //im[x][y] = "" + (char) cp + (char) cd;
 
@@ -153,7 +219,7 @@ public class WorldVisu {
                     v.setTurn(val);
                     
                     for(int i=0;i<w.P;i++){
-                        String sc=""+w.turn.get(val).scores[i];
+                        String sc=""+w.turn.get(v.currTurn).scores[i];
                                             lab[i*2].setText(sc);
                     }
 
