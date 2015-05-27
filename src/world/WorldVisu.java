@@ -1,0 +1,223 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package world;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import tools.L0_2dLib;
+
+/**
+ *
+ * @author Jahan
+ */
+public class WorldVisu {
+    
+    
+    static class View extends JPanel{
+        
+        final WorldBase w;
+        int currTurn=0;
+        double scale=0.4;
+        int droneRadius=5;
+        
+        final Color pcol[]=new Color[]{java.awt.Color.GRAY,java.awt.Color.BLUE,java.awt.Color.RED,java.awt.Color.GREEN};
+
+        public View(WorldBase w) {
+            this.w = w;
+            
+            double scaleScree=0.4;
+            this.setPreferredSize(new Dimension((int)(4000*scaleScree), (int)(1800*scaleScree)));
+        }
+        
+        public void nextTurn(){
+            currTurn++;
+            if(currTurn>=w.turn.size()){
+                currTurn=w.turn.size()-1;
+            }
+        }
+        
+        public void setTurn(int i){
+           // System.err.println("setting "+i+" turn gen : "+w.turn.size());
+            
+            currTurn=i;
+            
+            if(currTurn>=w.turn.size()){
+                currTurn=w.turn.size()-1;
+            }       
+            
+            this.repaint();
+        }
+        
+        
+        
+
+        @Override
+        public void paint(Graphics g) {
+            super.paint(g); //To change body of generated methods, choose Tools | Templates.
+            
+            g.setColor(java.awt.Color.lightGray);
+            g.fillRect(0, 0, this.getWidth(), this.getHeight());
+            
+            
+            int z = 0;
+            g.setColor(java.awt.Color.darkGray);
+            for (L0_2dLib.Point zz : w.zones) {
+                int x = (int) (zz.x() * scale);
+                int y = (int) (zz.y() * scale);
+                int zoneradius=(int)((WorldBase.world_ctdist*scale)/2);
+                char p = '#';
+                
+                int owner=w.turn.get(currTurn).owners[z];
+                
+                if(owner!=-1){
+                    p= (char)('0'+w.turn.get(currTurn).owners[z]);
+                    g.setColor(pcol[owner]);
+                }else{
+                    g.setColor(java.awt.Color.darkGray);
+                }
+
+                String zs = "" + p + ((char) ((char) 'A' + (char) z));
+                z++;
+                
+                g.fillOval(x-zoneradius, y-zoneradius, zoneradius*2, zoneradius*2);
+                g.drawString(zs, x-zoneradius, y-zoneradius);
+            }            
+            
+        for (int p = 0; p < w.P; p++) {
+            g.setColor(pcol[p]);
+            for (int d = 0; d < w.D; d++) {
+                int x = (int) (w.turn.get(currTurn).playerDrones.get(p).get(d).x * scale);
+                int y = (int) (w.turn.get(currTurn).playerDrones.get(p).get(d).y * scale);
+                int cp = '0' + (char) p;
+                int cd = 'a' + (char) d;
+                
+                g.fillOval(x-droneRadius, y-droneRadius, droneRadius*2, droneRadius*2);
+                g.drawString("" + (char) cp + (char) cd, x-droneRadius, y-droneRadius);
+
+                //im[x][y] = "" + (char) cp + (char) cd;
+
+            }
+        }            
+            
+        }
+        
+        
+        
+    }
+    
+    
+    public static class MyPanel extends JPanel{
+        final WorldBase w;
+        
+        public MyPanel(WorldBase wPar) {
+            View v=new View(wPar);
+            this.setLayout(new BorderLayout());
+            this.add(v, BorderLayout.CENTER );
+            this.w=wPar;
+            
+            JPanel right=new JPanel();
+            right.setLayout(new GridLayout(0,2));
+            right.add(new JLabel("Turn"));
+            JLabel numTurn=new JLabel("000000000000000");
+            right.add(numTurn);
+              
+            JLabel lab[]=new JLabel[w.P*2];
+            for(int i=0;i<w.P;i++){
+                lab[i*2]=new JLabel(w.bots.get(i).getClass().getSimpleName());
+                lab[i*2+1]=new JLabel(w.bots.get(i).getClass().getSimpleName());
+                right.add(lab[i*2]);right.add(lab[i*2 +1]);
+            }
+            
+
+            
+            JSlider slide=new JSlider(0, 200, 0);
+            slide.addChangeListener(new ChangeListener() {
+
+                @Override
+                public void stateChanged(ChangeEvent ce) {
+                    int val=slide.getValue();
+                   // System.err.println("New value for turn = "+val);
+                    v.setTurn(val);
+                    
+                    for(int i=0;i<w.P;i++){
+                        String sc=""+w.turn.get(val).scores[i];
+                                            lab[i*2].setText(sc);
+                    }
+
+                    
+                    for(int i=0;i<w.P;i++){
+                        String bn=""+w.bots.get(i).getClass().getSimpleName();
+                        lab[i*2+1].setText(bn);
+                    }
+                    
+                    numTurn.setText(""+v.currTurn);
+                }
+            });
+            
+            this.add(slide, BorderLayout.SOUTH);
+            this.add(right,BorderLayout.EAST);
+            
+        }        
+    
+    }
+    
+    
+    public static void create(WorldBase world){
+        //1. Create the frame.
+        JFrame frame = new JFrame("Wolrd");
+
+
+        //2. Optional: What happens when the frame closes?
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //3. Create components and put them in the frame.
+        //...create emptyLabel...
+        frame.getContentPane().add(new MyPanel(world), BorderLayout.CENTER);
+        
+
+        //4. Size the frame.
+        frame.pack();
+
+        //5. Show it.
+        frame.setVisible(true);        
+        
+    }
+    
+    public static void main (String[] args){
+        WorldBase w=new WorldBase(3, 5, 9937777, new WorldBase.BotSwarm(),new WorldBase.BotLost(),new WorldBase.TranquilleBot());
+        w.genWorld();
+        
+        int nbturn=40;
+        int pas=0;
+        
+        Thread genIt=new Thread(){
+
+            @Override
+            public void run() {
+                for(int i=0;i<nbturn;i++){
+                    w.genTurn();
+                }  
+            }
+            
+            
+        };        
+        genIt.start();
+        
+        create(w);
+      
+    }
+    
+}

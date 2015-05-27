@@ -145,7 +145,7 @@ public static class BotSwarm implements WorldBot {
         }
     }    
 
-    private class Turn {
+    public class Turn {
 
         final List<List<Point>> playerDrones;
         final List<List<Point>> playerDronesOrders;
