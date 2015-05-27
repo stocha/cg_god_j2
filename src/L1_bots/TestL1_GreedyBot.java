@@ -35,11 +35,11 @@ public class TestL1_GreedyBot extends L1_botStruct.BotBase {
         HashMap<Drone,Boolean> droneDone=new HashMap(D);
         
         for(RZoneDrone rzd : _rzonedrone.stream().sorted(byDist.reversed()).collect(Collectors.toList())){
-            System.err.println(""+rzd);
+           // System.err.println(""+rzd);
             
             if(rzd.d.owner==_me && !droneDone.containsKey(rzd.d) && rzd.z.owner!=_me){
                 _order.get(rzd.d).set(rzd.z);
-                System.err.println(""+rzd.d+" is heading to "+rzd.z);
+             //   System.err.println(""+rzd.d+" is heading to "+rzd.z);
                 droneDone.put(rzd.d, true);
             }        
         }
