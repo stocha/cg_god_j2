@@ -34,7 +34,8 @@ public class WorldVisu {
         
         final WorldBase w;
         int currTurn=0;
-        double scale=0.5;
+        double scale=0.4;
+        double scaleScree=scale;
         int droneRadius=4;
         
         double xs=0;
@@ -46,7 +47,7 @@ public class WorldVisu {
         public View(WorldBase w) {
             this.w = w;
             
-            double scaleScree=scale;
+            
             this.setPreferredSize(new Dimension((int)(4000*scaleScree), (int)(1800*scaleScree)));
             
             this.addMouseWheelListener(new MouseWheelListener() {
@@ -138,45 +139,58 @@ public class WorldVisu {
             int ox=(int)(xs);
             int oy=(int)(ys);
             
+            for (int p = 0; p < w.P; p++) {
+                g.setColor(pcol[p]);
+                for (int d = 0; d < w.D; d++) {
+                    int x = (int) (w.turn.get(currTurn).playerDrones.get(p).get(d).x * scale);
+                    int y = (int) (w.turn.get(currTurn).playerDrones.get(p).get(d).y * scale);
+                    int cp = '0' + (char) p;
+                    int cd = 'a' + (char) d;
+
+                    g.fillOval(ox + x-droneRadius, oy+ y-droneRadius, droneRadius*2, droneRadius*2);
+                    g.drawString("" + (char) cp + (char) cd,ox+ x-droneRadius, oy+ y-droneRadius);
+
+                    //im[x][y] = "" + (char) cp + (char) cd;
+
+                }
+            }              
+            
             int z = 0;
             g.setColor(java.awt.Color.darkGray);
             for (L0_2dLib.Point zz : w.zones) {
                 int x = (int) (zz.x() * scale);
                 int y = (int) (zz.y() * scale);
                 int zoneradius=(int)((WorldBase.world_ctdist*scale));
-                char p = '#';
+                char cc = '#';
                 
                 int owner=w.turn.get(currTurn).owners[z];
                 
                 if(owner!=-1){
-                    p= (char)('0'+w.turn.get(currTurn).owners[z]);
+                    cc= (char)('0'+w.turn.get(currTurn).owners[z]);
                     g.setColor(pcol[owner]);
                 }else{
                     g.setColor(java.awt.Color.darkGray);
                 }
 
-                String zs = "" + p + ((char) ((char) 'A' + (char) z));
-                z++;
+                String zs = "" + cc + ((char) ((char) 'A' + (char) z));
+
                 
                 g.fillOval(ox+x-zoneradius, oy+y-zoneradius, zoneradius*2, zoneradius*2);
                 g.drawString(zs,ox+ x-zoneradius,oy+ y-zoneradius);
+                
+                    g.setColor(java.awt.Color.darkGray);
+                    g.fillRect(ox+(20*(0)) +x-zoneradius +15,oy+ y-15,55,20);                
+                for(int p=0;p<w.P;p++){
+
+
+                    g.setColor(pcol[p]);
+                    g.drawString(""+w.turn.get(currTurn).zonePlayCount.get(z).get(p),ox+(20*(p+1)) +x-zoneradius,oy+ y);
+                }
+                
+                                z++;
             }            
             
-        for (int p = 0; p < w.P; p++) {
-            g.setColor(pcol[p]);
-            for (int d = 0; d < w.D; d++) {
-                int x = (int) (w.turn.get(currTurn).playerDrones.get(p).get(d).x * scale);
-                int y = (int) (w.turn.get(currTurn).playerDrones.get(p).get(d).y * scale);
-                int cp = '0' + (char) p;
-                int cd = 'a' + (char) d;
-                
-                g.fillOval(ox + x-droneRadius, oy+ y-droneRadius, droneRadius*2, droneRadius*2);
-                g.drawString("" + (char) cp + (char) cd,ox+ x-droneRadius, oy+ y-droneRadius);
-
-                //im[x][y] = "" + (char) cp + (char) cd;
-
-            }
-        }            
+          
             
         }
         

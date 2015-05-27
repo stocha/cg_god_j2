@@ -151,6 +151,8 @@ public static class BotSwarm implements WorldBot {
         final List<List<Point>> playerDronesOrders;
         final int owners[];
         final int scores[];
+        
+        List<List<Integer>> zonePlayCount=new ArrayList<>(Z);
 
         public Turn() {
             playerDrones = new ArrayList<>(P);
@@ -167,6 +169,14 @@ public static class BotSwarm implements WorldBot {
             }
             owners = new int[Z];
             scores = new int[P];
+            
+            for(int z=0;z<Z;z++){
+                zonePlayCount.add(new ArrayList<>(P));
+                for(int p=0;p<P;p++){
+                    zonePlayCount.get(z).add(0);
+                }
+            }        
+            
         }
 
         public void copy(Turn s) {
@@ -245,17 +255,12 @@ public static class BotSwarm implements WorldBot {
 
     public boolean genTurn() {
         int i = 0;
+        int lastTurn=turn.size() - 1;
         Turn prev = turn.get(turn.size() - 1);
         Turn newt = new Turn();
         newt.copy(prev);
         
-        List<List<Integer>> zonePlayCount=new ArrayList<>(Z);
-        for(int z=0;z<Z;z++){
-            zonePlayCount.add(new ArrayList<>(P));
-            for(int p=0;p<P;p++){
-                zonePlayCount.get(z).add(0);
-            }
-        }
+
 
         for (WorldBot b : bots) {
             Turn t = new Turn();
@@ -278,13 +283,13 @@ public static class BotSwarm implements WorldBot {
                 }
                 
                 newt.playerDrones.get(p).get(d).set(n);
-                System.err.println("Distance for drone "+p+"/"+d+" -> "+old.dist(n));
+                //System.err.println("Distance for drone "+p+"/"+d+" -> "+old.dist(n));
                 for(int z=0;z<Z;z++){
                     if(n.dist(zones.get(z))<=world_ctdist){
-                        int curr=zonePlayCount.get(z).get(p);
+                        int curr=newt.zonePlayCount.get(z).get(p);
                         //System.err.println("(before +1For"+p+"at"+z+")"+" total =" +curr);
-                        zonePlayCount.get(z).set(p,curr+1);
-                        System.err.println("(+1For"+p+"at"+z+")");
+                        newt.zonePlayCount.get(z).set(p,curr+1);
+                        //System.err.println("(+1For"+p+"at"+z+")");
                         //System.err.println("(after +1For"+p+"at"+z+")"+" total =" +zonePlayCount.get(z).get(p));
                     }
                 }
@@ -296,15 +301,15 @@ public static class BotSwarm implements WorldBot {
             
             int max=Integer.MIN_VALUE;
             for(int p=0;p<P;p++){
-                if(zonePlayCount.get(z).get(p)> max){
-                    max=zonePlayCount.get(z).get(p);
+                if(newt.zonePlayCount.get(z).get(p)> max){
+                    max=newt.zonePlayCount.get(z).get(p);
                 }
             }
             
             int countMax=0;
             int maxInd=-1;
             for(int p=0;p<P;p++){
-                if(zonePlayCount.get(z).get(p)== max){
+                if(newt.zonePlayCount.get(z).get(p)== max){
                     countMax++;
                     maxInd=p;
                 }
