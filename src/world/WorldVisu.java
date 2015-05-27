@@ -276,28 +276,5 @@ public class WorldVisu {
         
     }
     
-    public static void main (String[] args){
-        WorldBase w=new WorldBase(3, 5, 9937777, new WorldBase.BotSwarm(),new WorldBase.BotLost(),new WorldBase.TranquilleBot());
-        w.genWorld();
-        
-        int nbturn=40;
-        int pas=0;
-        
-        Thread genIt=new Thread(){
-
-            @Override
-            public void run() {
-                for(int i=0;i<nbturn;i++){
-                    w.genTurn();
-                }  
-            }
-            
-            
-        };        
-        genIt.start();
-        
-        create(w);
-      
-    }
     
 }
