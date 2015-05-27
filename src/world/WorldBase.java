@@ -77,6 +77,36 @@ public class WorldBase {
         }
     }
     
+    public static class TranquilleBot implements WorldBot {
+
+        List<List<Point>> droneLinesPerPlayer;
+        List<Point> orders;
+        int id = 0;
+
+        @Override
+        public void setup(int P, int Id, int D, int Z, List<Point> xyZ) {
+            orders = new ArrayList<>(D);
+            for (int d = 0; d < D; d++) {
+                orders.add(new Point());
+            }
+            this.id = Id;
+        }
+
+        @Override
+        public void turn(int[] zline, List<List<Point>> droneLinesPerPlayer) {
+            this.droneLinesPerPlayer = droneLinesPerPlayer;
+            for (int d = 0; d < orders.size(); d++) {
+                orders.get(d).set(droneLinesPerPlayer.get(id).get(d));
+                //orders.get(d).set(20 + 20 * d + 100 * id, 20 + 300 * id);
+            }
+        }
+
+        @Override
+        public List<Point> outorders() {
+            return orders;
+        }
+    }    
+    
     
 public static class BotSwarm implements WorldBot {
 
@@ -248,9 +278,14 @@ public static class BotSwarm implements WorldBot {
                 }
                 
                 newt.playerDrones.get(p).get(d).set(n);
+                System.err.println("Distance for drone "+p+"/"+d+" -> "+old.dist(n));
                 for(int z=0;z<Z;z++){
                     if(n.dist(zones.get(z))<=world_ctdist){
-                        zonePlayCount.get(z).set(zonePlayCount.get(z).get(p)+1,p);
+                        int curr=zonePlayCount.get(z).get(p);
+                        //System.err.println("(before +1For"+p+"at"+z+")"+" total =" +curr);
+                        zonePlayCount.get(z).set(p,curr+1);
+                        System.err.println("(+1For"+p+"at"+z+")");
+                        //System.err.println("(after +1For"+p+"at"+z+")"+" total =" +zonePlayCount.get(z).get(p));
                     }
                 }
 
@@ -273,7 +308,9 @@ public static class BotSwarm implements WorldBot {
                     countMax++;
                     maxInd=p;
                 }
+                //System.err.println("|"+zonePlayCount.get(z).get(p));
             }            
+            //System.err.println("->List force drone in "+z);
             if(countMax==1){
                 newt.owners[z]=maxInd;
             }
@@ -349,6 +386,10 @@ public static class BotSwarm implements WorldBot {
         for (int i = 0; i < P; i++) {
             res += "|" + this.turn.get(num).scores[i];
         }
+        
+        for (int i = 0; i < P; i++) {
+            res += "|" + this.bots.get(i).getClass().getSimpleName();
+        }        
         return res;
     }
 }

@@ -39,7 +39,7 @@ public class WorldTest {
     @Test
     public void testIt(){
         System.err.println("testing");
-        WorldBase w=new WorldBase(3, 5, 9937777, new WorldBase.BotSwarm(),new WorldBase.BotLost());
+        WorldBase w=new WorldBase(3, 5, 9937777, new WorldBase.BotSwarm(),new WorldBase.BotLost(),new WorldBase.TranquilleBot());
         w.genWorld();
         
         int nbturn=40;
