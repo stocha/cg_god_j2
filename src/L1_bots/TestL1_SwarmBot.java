@@ -23,16 +23,16 @@ public class TestL1_SwarmBot extends L1_botStruct.BotBase {
 
     @Override
     public List<L0_2dLib.Point> outorders() {
-        System.err.println("generating orders");
+        //System.err.println("generating orders");
         
         // find Zone where owner != me
         //for(Zone z : _
         Zone cible=null;
         
         for(Zone z : _zone){
-            System.err.println("Z->"+z);
+            //System.err.println("Z->"+z);
             if(z.owner!=_me){
-                System.err.println("Found one not mine !");
+                //System.err.println("Found one not mine !");
                 cible=z;
                 break;
             }
