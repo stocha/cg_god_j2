@@ -166,7 +166,8 @@ public class TestScenarios {
             }
         };
         
-        WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        //WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        WorldBase w=new WorldBase(3, 4, 9937777,new WorldBase.TranquilleBot(),new TesterBot(TestL1_DefenseBot.fact));
         w.genWorld();
         
         int nbturn=NBTURNS;

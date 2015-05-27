@@ -57,6 +57,29 @@ public class L1_botStruct {
 
     public static class BotBase {
 
+        public class RDroneDrone {
+
+            final Drone friend;
+            final Drone foe;
+
+            public RDroneDrone(Drone friend, Drone foe) {
+                this.friend = friend;
+                this.foe = foe;
+            }
+
+            public double getDist() {
+                return dist;
+            }
+
+            double dist;
+
+            @Override
+            public String toString() {
+                return "RZoneDrone{" + "f=" + friend + ", e=" + foe + ", dist=" + dist + '}';
+            }
+
+        }
+
         public class RZoneDrone {
 
             final Zone z;
@@ -105,6 +128,10 @@ public class L1_botStruct {
         Comparator<RZoneDrone> byDist = (e1, e2) -> {
             return (int) (e2.dist - e1.dist);
         };
+        
+        Comparator<RDroneDrone> rDroneDronebyDist = (e1, e2) -> {
+            return (int) (e2.dist - e1.dist);
+        };        
 
         final public List<RZoneDrone> buildRZoneDrone() {
             List<RZoneDrone> res = new ArrayList<>(D * P * Z);
@@ -117,15 +144,38 @@ public class L1_botStruct {
                     }
                 }
             }
+            
+    
             return res;
         }
-
-        public void calcRZoneDrone() {
+        
+        final private void rZoneDrone_setDistanceCalc(){
             for (RZoneDrone r : _rzonedrone) {
                 r.dist = r.z.dist(r.d);
-            }
-
+            }                    
         }
+
+        final public List<RDroneDrone> buildRDroneDrone() {
+            List<RDroneDrone> res = new ArrayList<>(D * D *P);
+            
+            for (Drone m : _drone.get(_me)) {
+                for (PlayerAI p : _player) {
+                    if(p==_me) continue;
+                    for (Drone d : _drone.get(p)) {
+                        RDroneDrone rzd = new RDroneDrone(m, d);
+                        res.add(rzd);
+                    }
+                }
+            }            
+
+            return res;
+        }
+          final public void rDroneDrone_setDistanceCalc(List<RDroneDrone> it){
+            for (RDroneDrone r : it) {
+                r.dist = r.friend.dist(r.foe);
+            }                    
+        }
+
 
         public class Zone implements L0_2dLib.WithCoord {
 
@@ -327,7 +377,8 @@ public class L1_botStruct {
             for (Drone d : _drone.get(pp)) {
                 d.set(xyZ.get(d.id));
             }
-            calcRZoneDrone();
+            
+            rZoneDrone_setDistanceCalc();       
         }
 
         public List<L0_2dLib.Point> outorders() {
@@ -361,12 +412,18 @@ public class L1_botStruct {
 
         @Override
         public void turn(int[] zline, List<List<L0_2dLib.Point>> droneLinesPerPlayer) {
+            long t0 = System.currentTimeMillis();
+
             bot.inputTurnZonesOwner(zline);
 
             for (int i = 0; i < droneLinesPerPlayer.size(); i++) {
                 bot.inputTurnPlayerBot(i, droneLinesPerPlayer.get(i));
             }
 
+            long t1 = System.currentTimeMillis();
+
+            long t = t1 - t0;
+            System.err.println("" + t + " ms");
         }
 
         @Override
@@ -443,28 +500,28 @@ public class L1_botStruct {
                 int own = in.nextInt();
                 _owner[i] = own;
             }
-            
+
             theBot.inputTurnZonesOwner(_owner);
 
             for (int i = 0; i < P; i++) {
 
                 for (int j = 0; j < D; j++) {
                     _playerDronesCords[i][j].set(in.nextInt(), in.nextInt());
-                }           
-                
+                }
+
                 theBot.inputTurnPlayerBot(i, Arrays.asList(_playerDronesCords[i]));
-            }            
+            }
         }
 
         public void writeOrders(PrintStream out) {
 
             List<L0_2dLib.Point> orders = theBot.outorders();
-            for(int d=0;d<D;d++){
+            for (int d = 0; d < D; d++) {
                 _orders[d].set(orders.get(d));
             }
-            
+
             for (int d = 0; d < D; d++) {
-                out.println("" + (int)_orders[d].x + " " + (int)_orders[d].y);
+                out.println("" + (int) _orders[d].x + " " + (int) _orders[d].y);
             }
 
             _turn_Number++;
