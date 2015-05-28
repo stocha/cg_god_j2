@@ -180,7 +180,9 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
 
             @Override
             public String toString() {
-                return "ZI{" + " defend " + defender + "clo=" + closest + "" + '}';
+                return "ZI{" + " def" + defCandidat +" att "+attackCandidate;
+                        
+                        //+ "clo=" + closest + "" + '}';
             }
 
         }
@@ -226,6 +228,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
                 }
 
                 int lvl = 0;
+                System.err.println("Offense lvl 0");
                 for (L1_botStruct.BotBase.RZoneDrone rzd : sortedRzd) {
                     if (rzd.z.owner != p) {
                         continue;
@@ -233,17 +236,22 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
 
                     int nlv = rzd.level;
                     if (lvl != nlv) {
+                        System.err.println("Offense lvl "+nlv+" fermeture "+lvl);
                         lvl = nlv;
 
                         for (Zone z : _zone) {
                             if (z.owner != p) {
                                 continue;
                             }
-                            if (zoneInfo.get(z).attackCandidate.size() > zoneInfo.get(z).defCandidat.size()) {
+                            if(attacked.contains(z)) continue;
+                            
+                            if (zoneInfo.get(z).attackCandidate.size() > zoneInfo.get(z).defCandidat.size() && zoneInfo.get(z).defCandidat.size() <=D/2) {
+                                System.err.println("Assault on "+z+" "+zoneInfo.get(z));
                                 for (Drone att : zoneInfo.get(z).attackCandidate) {
                                     _order.get(att).set(z);
                                     doneBot[att.id] = true;
                                 }
+                                attacked.add(z);
 
                             }
 
@@ -270,6 +278,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
 
                 } // fin Zone / drone
 
+                System.err.println("Offense lvl "+lvl+" fermeture "+lvl);
                 for (Zone z : _zone) { // level final
                     if (z.owner != p) {
                         continue;
