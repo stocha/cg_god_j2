@@ -235,7 +235,7 @@ public static class BotSwarm implements WorldBot {
 
         this.turn = new ArrayList<>(nb_turns);
 
-        this.rand = new Random(seed);
+        this.rand = new Random(seed*458784111);
     }
 
     public void genWorld() {

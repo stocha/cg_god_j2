@@ -103,6 +103,7 @@ public class L1_botStruct {
             }
 
             double dist;
+            int level;
 
             @Override
             public String toString() {
@@ -110,24 +111,19 @@ public class L1_botStruct {
             }
 
         }
-
-        Comparator<RZoneDrone> byZoneDist = (e1, e2) -> {
-            if (e2.z != e1.z) {
-                return e2.z.id - e1.z.id;
-            } else {
-                return (int) (e2.dist - e1.dist);
-            }
-        };
-        Comparator<RZoneDrone> byDroneDist = (e1, e2) -> {
-            if (e2.d != e1.d) {
-                return e2.d.id - e1.d.id;
-            } else {
-                return (int) (e2.dist - e1.dist);
-            }
-        };
+    
         Comparator<RZoneDrone> byDist = (e1, e2) -> {
             return (int) (e2.dist - e1.dist);
         };
+        
+        Comparator<RZoneDrone> byLevel = (e1, e2) -> {
+            if(e2.level != e1.level){
+                return (int) (e2.level - e1.level);
+            }else{
+                return 0;
+            }
+
+        };        
         
         Comparator<RDroneDrone> rDroneDronebyDist = (e1, e2) -> {
             return (int) (e2.dist - e1.dist);
@@ -152,6 +148,7 @@ public class L1_botStruct {
         final private void rZoneDrone_setDistanceCalc(){
             for (RZoneDrone r : _rzonedrone) {
                 r.dist = r.z.dist(r.d);
+                r.level=(int)(r.dist-1) /100;
             }                    
         }
 

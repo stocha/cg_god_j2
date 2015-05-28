@@ -195,7 +195,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         }
         
         private void buildDroneZoneInfo() {
-            sortedRzd= _rzonedrone.stream().sorted(byDist.reversed()).collect(Collectors.toList())            ;
+            sortedRzd= _rzonedrone.stream().sorted(byLevel.reversed()).collect(Collectors.toList())            ;
             
             for (L1_botStruct.BotBase.PlayerAI p : _player) {
                 for (L1_botStruct.BotBase.Drone d : _drone.get(p)) {
@@ -300,19 +300,22 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         
         public void defenseDoing(boolean[] doneBot) {
             buildDroneZoneInfo();
-            List<L1_botStruct.BotBase.Drone> done=new ArrayList<>(D);          
+            List<L1_botStruct.BotBase.Drone> done=new ArrayList<>(D);         
+            List<Zone> failed=new ArrayList<>(D);
             
             for(L1_botStruct.BotBase.RZoneDrone rzd : sortedRzd){
                 L1_botStruct.BotBase.Drone d = rzd.d;
                 L1_botStruct.BotBase.Zone z = rzd.z;
                 
                     if(done.contains(d) || doneBot[d.id]) continue;
+                    if(failed.contains(z)) continue;
                     
                     if(d.owner==_me){
                         zoneInfo.get(z).defCandidat.add(d);
                     }else
                     if(d.owner!=_me && zoneInfo.get(z).defCandidat.isEmpty()){
                         //heeem ... failure.
+                        failed.add(z);
                     }else if(d.owner!=_me && !zoneInfo.get(z).defCandidat.isEmpty() && zoneInfo.get(z).defender.size()<nbDroneDef){
                         L1_botStruct.BotBase.Drone dd = zoneInfo.get(z).defCandidat.get(0);
                         zoneInfo.get(z).defCandidat.remove(dd);
