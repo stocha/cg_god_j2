@@ -23,7 +23,7 @@ import static world.WorldVisu.create;
  */
 public class TestScenarios {
     
-    final static int NBTURNS=50;
+    final static int NBTURNS=100;
     
     public static class TesterBot implements WorldBase.WorldBot{
         
