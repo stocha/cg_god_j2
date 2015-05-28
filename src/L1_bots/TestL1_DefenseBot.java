@@ -37,13 +37,12 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         
         public class ZoneInfo {
 
-            List<Drone> closest = new ArrayList<>(D * P);
             List<Drone> defender= new ArrayList<>(D);
             List<Drone> defCandidat=new ArrayList<>(D);             
 
             @Override
             public String toString() {
-                return "ZI{"+" defend "+defender + "clo=" + closest +""+ '}';
+                return "ZI{"+" defend "+defender +""+ '}';
             } 
             
             
@@ -57,7 +56,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         }
         
         private void buildDroneZoneInfo() {
-            sortedRzd= _rzonedrone.stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id))).collect(Collectors.toList())            ;
+            sortedRzd= _rzonedrone.stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList())            ;
             
             for (PlayerAI p : _player) {
                 for (Drone d : _drone.get(p)) {
@@ -71,7 +70,6 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
             for (RZoneDrone rdz : sortedRzd) {
                 int level=(int)((rdz.dist-1)/100);
                 droneInfo.get(rdz.d).meLevel.put(rdz.z, level);
-                zoneInfo.get(rdz.z).closest.add(rdz.d);
                 
               // System.err.println(""+rdz);
             }
@@ -96,10 +94,15 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         
         public void defenseDoing() {
             buildDroneZoneInfo();
-            List<Drone> done=new ArrayList<>(D);          
+            List<Drone> done=new ArrayList<>(D);       
+            
+            for(Zone z : _zone){
+                 zoneInfo.get(z).defCandidat.clear();
+                 zoneInfo.get(z).defender.clear();
+            }
             
             for(RZoneDrone rzd : sortedRzd){
-                System.err.println(""+rzd);
+                //System.err.println(""+rzd);
                 
                 Drone d = rzd.d;
                 Zone z = rzd.z;
