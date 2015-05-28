@@ -23,7 +23,7 @@ import static world.WorldVisu.create;
  */
 public class TestScenarios {
     
-    final static int NBTURNS=100;
+    final static int NBTURNS=200;
     
     public static class TesterBot implements WorldBase.WorldBot{
         
@@ -66,8 +66,10 @@ public class TestScenarios {
     public static void testOffensiveL1Bot(){
  
         //WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
-        WorldBase w=new WorldBase(5, 4, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        //WorldBase w=new WorldBase(5, 4, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot.fact));
         //WorldBase w=new WorldBase(9, 4, 9937777,new TesterBot(TestL1_DefenseBot.fact),new TesterBot(TestL1_GreedyBot.fact));
+        WorldBase w=new WorldBase(1, 3, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        
         w.genWorld();
         
         int nbturn=NBTURNS;
