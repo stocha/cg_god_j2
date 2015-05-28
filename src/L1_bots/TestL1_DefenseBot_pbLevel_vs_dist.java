@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  *
  * @author Jahan
  */
-public class TestL1_DefenseBot extends L1_botStruct.BotBase {
+public class TestL1_DefenseBot_pbLevel_vs_dist extends L1_botStruct.BotBase {
     
     public class IA {
         
@@ -139,12 +139,12 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
     
     private final IA ia;
     
-    public TestL1_DefenseBot(int P, int Id, int D, int Z) {
+    public TestL1_DefenseBot_pbLevel_vs_dist(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
         ia = new IA(D / 2);
     }
     
-    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL1_DefenseBot(P1, Id1, D1, Z1);
+    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL1_DefenseBot_pbLevel_vs_dist(P1, Id1, D1, Z1);
     
     @Override
     public List<L0_2dLib.Point> outorders() {

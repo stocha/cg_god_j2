@@ -5,7 +5,7 @@ import L1_bots.L1_botStruct;
 import L1_bots.TestL1_SwarmBot;
 import java.util.List;
 import L0_tools.L0_2dLib;
-import L1_bots.TestL1_DefenseBot;
+import L1_bots.TestL1_DefenseBot_pbLevel_vs_dist;
 import L1_bots.TestL1_GreedyBot;
 import L1_bots.TestL1_OffenseBot;
 import world.WorldBase;
@@ -63,7 +63,7 @@ public class TestScenarios {
     public static void testOffensiveL1Bot(){
  
         //WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
-        WorldBase w=new WorldBase(5, 4, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        WorldBase w=new WorldBase(5, 4, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot_pbLevel_vs_dist.fact));
         //WorldBase w=new WorldBase(9, 4, 9937777,new TesterBot(TestL1_DefenseBot.fact),new TesterBot(TestL1_GreedyBot.fact));
         w.genWorld();
         
@@ -197,7 +197,7 @@ public class TestScenarios {
         //WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
         //WorldBase w=new WorldBase(5, 4, 9937777,new WorldBase.TranquilleBot(),new TesterBot(TestL1_DefenseBot.fact));
         //WorldBase w=new WorldBase(9, 4, 9937777,new TesterBot(TestL1_DefenseBot.fact),new TesterBot(TestL1_GreedyBot.fact));
-        WorldBase w=new WorldBase(5, 4, 110,new WorldBase.TranquilleBot(),new TesterBot(TestL1_DefenseBot.fact));
+        WorldBase w=new WorldBase(5, 4, 110,new WorldBase.TranquilleBot(),new TesterBot(TestL1_DefenseBot_pbLevel_vs_dist.fact));
         w.genWorld();
         
         int nbturn=NBTURNS;
