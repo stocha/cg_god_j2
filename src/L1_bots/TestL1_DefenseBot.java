@@ -24,12 +24,29 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         public class DroneInfo {
 
             HashMap<Zone, Integer> meLevel = new HashMap<>(Z);
+
+            @Override
+            public String toString() {
+                return "DI{" + "meLevel=" + meLevel + '}';
+            }
+            
+            
+            
         }        
         HashMap<Drone, DroneInfo> droneInfo = new HashMap<>(D);
         
         public class ZoneInfo {
 
             List<Drone> closest = new ArrayList<>(D * P);
+            List<Drone> defender= new ArrayList<>(D);
+            List<Drone> defCandidat=new ArrayList<>(D);             
+
+            @Override
+            public String toString() {
+                return "ZI{"+" defend "+defender + "clo=" + closest +""+ '}';
+            } 
+            
+            
         }
          HashMap<Zone, ZoneInfo> zoneInfo = new HashMap<>(D);
         
@@ -56,7 +73,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
                 droneInfo.get(rdz.d).meLevel.put(rdz.z, level);
                 zoneInfo.get(rdz.z).closest.add(rdz.d);
                 
-               // System.err.println(""+rdz);
+              // System.err.println(""+rdz);
             }
             
         }
@@ -79,40 +96,34 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         
         public void defenseDoing() {
             buildDroneZoneInfo();
-            HashMap<Drone,Boolean> done=new HashMap<>(D);
-            List<Drone> defDrone=new ArrayList<>(D);           
+            List<Drone> done=new ArrayList<>(D);          
             
-outerloop :
-            for(Zone z : _controled.get(_me)){
+            for(RZoneDrone rzd : sortedRzd){
+                Drone d = rzd.d;
+                Zone z = rzd.z;
                 
-                int defed=0;
-                for(Drone d : zoneInfo.get(z).closest){
-                    //System.err.println("def "+z+" "+d);
-                    if(done.containsKey(d)) continue;
+                    if(done.contains(d)) continue;
                     
                     if(d.owner==_me){
-                        defDrone.add(d);
+                        zoneInfo.get(z).defCandidat.add(d);
                     }else
-                    if(d.owner!=_me && defDrone.isEmpty()){
-                        continue outerloop;
-                    }else if(d.owner!=_me && !defDrone.isEmpty()){
-                        Drone dd = defDrone.get(0);
-                        defDrone.remove(dd);
-                        done.put(dd,true);
-                        defed++;
+                    if(d.owner!=_me && zoneInfo.get(z).defCandidat.isEmpty()){
+                        //heeem ... failure.
+                    }else if(d.owner!=_me && !zoneInfo.get(z).defCandidat.isEmpty() && zoneInfo.get(z).defender.size()<2){
+                        Drone dd = zoneInfo.get(z).defCandidat.get(0);
+                        zoneInfo.get(z).defCandidat.remove(dd);
+                        done.add(dd);
+                        zoneInfo.get(z).defender.add(dd);
+                        //System.err.println("Defending "+z+" with "+dd+" against "+d);
+                        //System.err.println("Already defending "+done);
                         if(droneInfo.get(dd).meLevel.get(z) +2 <= droneInfo.get(d).meLevel.get(z)){
                             _order.put(dd, d.cor);
                         }else{
                             _order.put(dd, z.cor);
                         }
-                        
-                        if(defed>=2) continue outerloop;
-                    }
-                }
-                
-            }
+                    }                
             
-            
+            }                                    
         }
         
         public void reflechirTour() {            
