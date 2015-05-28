@@ -127,7 +127,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         }
         
         public void reflechirTour() {            
-            if (_controled.get(_me).size() < 2) {
+            if (_controled.get(_me).size() < 1) {
                 greedyDoing();                
             } else {
                 defenseDoing();
