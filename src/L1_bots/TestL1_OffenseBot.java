@@ -223,7 +223,25 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
             
             for(PlayerAI p : _player){
                 if(p==_me) continue;
+                
+                int lvl=0;
                 for(L1_botStruct.BotBase.RZoneDrone rzd : sortedRzd){
+                    int nlv=rzd.level;
+                    if(lvl != nlv){
+                        lvl=nlv;
+                        
+                        for(Zone z : _zone){
+                            if(zoneInfo.get(z).attackCandidate.size()>zoneInfo.get(z).defCandidat.size()){
+                                for(Drone att : zoneInfo.get(z).attackCandidate){
+                                    _order.get(att).set(z);
+                                    doneBot[att.id]=true;
+                                }
+                                
+                            }
+                        
+                        }
+                        
+                    }
                     L1_botStruct.BotBase.Drone d = rzd.d;
                     L1_botStruct.BotBase.Zone z = rzd.z;
 
@@ -233,30 +251,10 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
                         if(d.owner==p){
                             zoneInfo.get(z).defCandidat.add(d);
                         }else
-                        if(d.owner==_me && zoneInfo.get(z).defCandidat.isEmpty()){
+                        if(d.owner==_me ){
                             zoneInfo.get(z).attackCandidate.add(d);
-                            if(!attacked.contains(z)){
-                                attacked.add(z);
-                                
-                                for(Drone dat : zoneInfo.get(z).attackCandidate){
-                                    _order.put(dat, z.cor);
-                                    doneBot[dat.id]=true;
-                                }
-                                
-                            }
-                            
-                            //heeem ... failure.
-                            // Found a target !
-                        }else if(d.owner==_me  ){
-                            
-                            if(!zoneInfo.get(z).defCandidat.isEmpty()){
-                                L1_botStruct.BotBase.Drone dd = zoneInfo.get(z).defCandidat.get(0);
-                                zoneInfo.get(z).defCandidat.remove(dd);
-                                done.add(dd);
-                                zoneInfo.get(z).defender.add(dd);
-                            }
-                            zoneInfo.get(z).attackCandidate.add(d);
-                        }                
+
+                        }               
 
                 }       
             }
