@@ -56,6 +56,28 @@ public class L1_botStruct {
     }
 
     public static class BotBase {
+        
+            public static class  ByPlayerRzd implements Comparator<RZoneDrone>{
+                final int firstPlayer;
+
+            public ByPlayerRzd(int firstPlayer) {
+                this.firstPlayer = firstPlayer;
+            }
+                
+                
+
+                @Override
+                public int compare(RZoneDrone e1, RZoneDrone e2) {
+                    int o1=e1.d.owner.id;
+                    int o2=e2.d.owner.id;
+                    
+                    if(o1==o2) return 0;
+                    if(o1==firstPlayer) return -1;
+                    if(o2==firstPlayer) return 1;
+                    
+                                    return (int) (o2-o1);
+                }
+            }             
 
         public class RDroneDrone {
 
@@ -75,7 +97,7 @@ public class L1_botStruct {
 
             @Override
             public String toString() {
-                return "RZoneDrone{" + "f=" + friend + ", e=" + foe + ", dist=" + dist + '}';
+                return "Rdd{" + "f=" + friend + ", e=" + foe + ", dist=" + dist + '}';
             }
 
         }
@@ -107,8 +129,8 @@ public class L1_botStruct {
 
             @Override
             public String toString() {
-                return "RZoneDrone{" + "z=" + z + ", d=" + d + ", dist=" + dist + '}';
-            }
+                return "Rzd{" + "z=" + z + ", d=" + d + ", " + dist + ", L=" + level + '}';
+            }                  
 
         }
     
@@ -117,13 +139,16 @@ public class L1_botStruct {
         };
         
         Comparator<RZoneDrone> byLevel = (e1, e2) -> {
-            if(e2.level != e1.level){
                 return (int) (e2.level - e1.level);
-            }else{
-                return 0;
-            }
 
-        };        
+
+        };          
+        
+        Comparator<RZoneDrone> byPlayer = (e1, e2) -> {
+                return (int) (e2.d.owner.id  - e1.d.owner.id);
+
+
+        };          
         
         Comparator<RDroneDrone> rDroneDronebyDist = (e1, e2) -> {
             return (int) (e2.dist - e1.dist);
@@ -145,7 +170,7 @@ public class L1_botStruct {
             return res;
         }
         
-        final private void rZoneDrone_setDistanceCalc(){
+        private void rZoneDrone_setDistanceCalc(){
             for (RZoneDrone r : _rzonedrone) {
                 r.dist = r.z.dist(r.d);
                 r.level=(int)(r.dist-1) /100;
