@@ -175,7 +175,8 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
 
             List<L1_botStruct.BotBase.Drone> closest = new ArrayList<>(D * P);
             List<L1_botStruct.BotBase.Drone> defender= new ArrayList<>(D);
-            List<L1_botStruct.BotBase.Drone> defCandidat=new ArrayList<>(D);             
+            List<L1_botStruct.BotBase.Drone> defCandidat=new ArrayList<>(D); 
+            List<L1_botStruct.BotBase.Drone> attackCandidate=new ArrayList<>(D);
 
             @Override
             public String toString() {
@@ -215,7 +216,54 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
             
         }
         
-        public void offenseSplit() {
+        public void opportunistAttack(boolean[] doneBot){
+            buildDroneZoneInfo();
+            List<L1_botStruct.BotBase.Drone> done=new ArrayList<>(D);     
+            List<Zone> attacked=new ArrayList<>();
+            
+            for(PlayerAI p : _player){
+                if(p==_me) continue;
+                for(L1_botStruct.BotBase.RZoneDrone rzd : sortedRzd){
+                    L1_botStruct.BotBase.Drone d = rzd.d;
+                    L1_botStruct.BotBase.Zone z = rzd.z;
+
+                        if(done.contains(d)) continue;
+                        if(d.owner==_me && doneBot[d.id]) continue;
+
+                        if(d.owner==p){
+                            zoneInfo.get(z).defCandidat.add(d);
+                        }else
+                        if(d.owner==_me && zoneInfo.get(z).defCandidat.isEmpty()){
+                            zoneInfo.get(z).attackCandidate.add(d);
+                            if(!attacked.contains(z)){
+                                attacked.add(z);
+                                
+                                for(Drone dat : zoneInfo.get(z).attackCandidate){
+                                    _order.put(dat, z.cor);
+                                    doneBot[dat.id]=true;
+                                }
+                                
+                            }
+                            
+                            //heeem ... failure.
+                            // Found a target !
+                        }else if(d.owner==_me  ){
+                            
+                            if(!zoneInfo.get(z).defCandidat.isEmpty()){
+                                L1_botStruct.BotBase.Drone dd = zoneInfo.get(z).defCandidat.get(0);
+                                zoneInfo.get(z).defCandidat.remove(dd);
+                                done.add(dd);
+                                zoneInfo.get(z).defender.add(dd);
+                            }
+                            zoneInfo.get(z).attackCandidate.add(d);
+                        }                
+
+                }       
+            }
+            
+        }
+        
+        public void offenseSplit(boolean[] doneBot) {
             L0_2dLib.WithCoord cible = null;
             
             List<L0_2dLib.WithCoord> geoPoint=new ArrayList<>(Z*Z*Z);
@@ -230,6 +278,8 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
                 Drone dcand=null;
                 double dMin=Double.MAX_VALUE;
                 for(Drone d : _drone.get(_me)){
+                    if(doneBot[d.id]) continue;
+                    
                     if(droneDone.containsKey(d) || geoDone.containsKey(geo)){
                         continue;
                     }
@@ -242,12 +292,13 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
                 if(dcand!=null){
                     droneDone.put(dcand, true);
                     geoDone.put(geo, true);
-                    _order.get(dcand).set(geo);                    
+                    _order.get(dcand).set(geo);    
+                    doneBot[dcand.id]=true;
                 }
             }            
         }
         
-        public void defenseDoing() {
+        public void defenseDoing(boolean[] doneBot) {
             buildDroneZoneInfo();
             List<L1_botStruct.BotBase.Drone> done=new ArrayList<>(D);          
             
@@ -255,7 +306,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
                 L1_botStruct.BotBase.Drone d = rzd.d;
                 L1_botStruct.BotBase.Zone z = rzd.z;
                 
-                    if(done.contains(d)) continue;
+                    if(done.contains(d) || doneBot[d.id]) continue;
                     
                     if(d.owner==_me){
                         zoneInfo.get(z).defCandidat.add(d);
@@ -272,6 +323,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
                         if(droneInfo.get(dd).meLevel.get(z) +2 <= droneInfo.get(d).meLevel.get(z)){
                             _order.put(dd, d.cor);
                         }else{
+                            doneBot[dd.id]=true;
                             _order.put(dd, z.cor);
                         }
                     }                
@@ -279,11 +331,19 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
             }                                    
         }
         
-        public void reflechirTour() {            
-            if (_controled.get(_me).size() < 2) {
-                offenseSplit();                
+        public void reflechirTour() {  
+            boolean[] doneBot=new boolean[D];
+            for(int i=0;i<doneBot.length;i++){
+                doneBot[i]=false;
+            }
+            
+            if (_controled.get(_me).size() < 1) {
+                opportunistAttack(doneBot); 
+                offenseSplit(doneBot);                
             } else {
-                defenseDoing();
+                defenseDoing(doneBot);
+                opportunistAttack(doneBot);                
+                offenseSplit(doneBot);
             }
             
         }
