@@ -422,6 +422,7 @@ public class L1_botStruct {
 
             long t1 = System.currentTimeMillis();
 
+            System.gc();
             long t = t1 - t0;
             System.err.println("" + t + " ms");
         }

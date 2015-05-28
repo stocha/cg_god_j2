@@ -19,6 +19,8 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
     
     public class IA {
         
+        List<RZoneDrone> sortedRzd=null;
+        
         public class DroneInfo {
 
             HashMap<Zone, Integer> meLevel = new HashMap<>(Z);
@@ -38,6 +40,8 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         }
         
         private void buildDroneZoneInfo() {
+            sortedRzd= _rzonedrone.stream().sorted(byDist.reversed()).collect(Collectors.toList())            ;
+            
             for (PlayerAI p : _player) {
                 for (Drone d : _drone.get(p)) {
                     droneInfo.put(d, new DroneInfo());
@@ -47,10 +51,12 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
                 zoneInfo.put(z, new ZoneInfo());
             }
             
-            for (RZoneDrone rdz : _rzonedrone) {
+            for (RZoneDrone rdz : sortedRzd) {
                 int level=(int)((rdz.dist-1)/100);
                 droneInfo.get(rdz.d).meLevel.put(rdz.z, level);
                 zoneInfo.get(rdz.z).closest.add(rdz.d);
+                
+               // System.err.println(""+rdz);
             }
             
         }
@@ -74,11 +80,14 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         public void defenseDoing() {
             buildDroneZoneInfo();
             HashMap<Drone,Boolean> done=new HashMap<>(D);
-            List<Drone> defDrone=new ArrayList<>(D);                    
+            List<Drone> defDrone=new ArrayList<>(D);           
             
 outerloop :
             for(Zone z : _controled.get(_me)){
+                
+                int defed=0;
                 for(Drone d : zoneInfo.get(z).closest){
+                    //System.err.println("def "+z+" "+d);
                     if(done.containsKey(d)) continue;
                     
                     if(d.owner==_me){
@@ -90,11 +99,14 @@ outerloop :
                         Drone dd = defDrone.get(0);
                         defDrone.remove(dd);
                         done.put(dd,true);
+                        defed++;
                         if(droneInfo.get(dd).meLevel.get(z) +2 <= droneInfo.get(d).meLevel.get(z)){
                             _order.put(dd, d.cor);
                         }else{
                             _order.put(dd, z.cor);
                         }
+                        
+                        if(defed>=2) continue outerloop;
                     }
                 }
                 
