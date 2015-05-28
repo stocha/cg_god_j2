@@ -94,7 +94,8 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         
         public void defenseDoing() {
             buildDroneZoneInfo();
-            List<Drone> done=new ArrayList<>(D);       
+            List<Drone> done=new ArrayList<>(D);     
+            List<Zone> fail=new ArrayList<>(Z);
             
             for(Zone z : _zone){
                  zoneInfo.get(z).defCandidat.clear();
@@ -103,9 +104,11 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
             
             for(RZoneDrone rzd : sortedRzd){
                 //System.err.println(""+rzd);
+
                 
                 Drone d = rzd.d;
                 Zone z = rzd.z;
+                                if(fail.contains(z)) continue;
                 
                     if(done.contains(d)) continue;
                     
@@ -114,6 +117,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
                     }else
                     if(d.owner!=_me && zoneInfo.get(z).defCandidat.isEmpty()){
                         //heeem ... failure.
+                        fail.add(z);
                     }else if(d.owner!=_me && !zoneInfo.get(z).defCandidat.isEmpty() && zoneInfo.get(z).defender.size()<nbDroneDef){
                         Drone dd = zoneInfo.get(z).defCandidat.get(0);
                         zoneInfo.get(z).defCandidat.remove(dd);
@@ -126,7 +130,9 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
                         }else{
                             _order.put(dd, z.cor);
                         }
-                    }                
+                    }      else{
+                        fail.add(z);
+                    }
             
             }                                    
         }

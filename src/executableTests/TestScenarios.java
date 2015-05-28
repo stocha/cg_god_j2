@@ -225,8 +225,8 @@ public class TestScenarios {
     
     
     public static void main (String[] args){
-        testDefenderL1Bot();
-        //testOffensiveL1Bot();
+        //testDefenderL1Bot();
+        testOffensiveL1Bot();
 
     }
 }
