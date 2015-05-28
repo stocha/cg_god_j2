@@ -109,7 +109,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
                     }else
                     if(d.owner!=_me && zoneInfo.get(z).defCandidat.isEmpty()){
                         //heeem ... failure.
-                    }else if(d.owner!=_me && !zoneInfo.get(z).defCandidat.isEmpty() && zoneInfo.get(z).defender.size()<2){
+                    }else if(d.owner!=_me && !zoneInfo.get(z).defCandidat.isEmpty() && zoneInfo.get(z).defender.size()<nbDroneDef){
                         Drone dd = zoneInfo.get(z).defCandidat.get(0);
                         zoneInfo.get(z).defCandidat.remove(dd);
                         done.add(dd);
@@ -128,7 +128,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         
         public void reflechirTour() {            
             if (_controled.get(_me).size() < 2) {
-                greedyDoing();
+                greedyDoing();                
             } else {
                 defenseDoing();
             }

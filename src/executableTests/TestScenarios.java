@@ -7,6 +7,7 @@ import java.util.List;
 import L0_tools.L0_2dLib;
 import L1_bots.TestL1_DefenseBot;
 import L1_bots.TestL1_GreedyBot;
+import L1_bots.TestL1_OffenseBot;
 import world.WorldBase;
 import static world.WorldVisu.create;
 
@@ -22,7 +23,7 @@ import static world.WorldVisu.create;
  */
 public class TestScenarios {
     
-    final static int NBTURNS=20;
+    final static int NBTURNS=50;
     
     public static class TesterBot implements WorldBase.WorldBot{
         
@@ -58,6 +59,33 @@ public class TestScenarios {
             }        
         
     }
+    
+    public static void testOffensiveL1Bot(){
+ 
+        //WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        WorldBase w=new WorldBase(5, 4, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        //WorldBase w=new WorldBase(9, 4, 9937777,new TesterBot(TestL1_DefenseBot.fact),new TesterBot(TestL1_GreedyBot.fact));
+        w.genWorld();
+        
+        int nbturn=NBTURNS;
+        int pas=0;
+        
+        Thread genIt=new Thread(){
+
+            @Override
+            public void run() {
+                for(int i=0;i<nbturn;i++){
+                    w.genTurn();
+                }  
+            }
+            
+            
+        };        
+        genIt.start();
+        
+        create(w);                
+        
+    }        
     
     
     public static void testVisu(){
@@ -193,7 +221,8 @@ public class TestScenarios {
     
     
     public static void main (String[] args){
-        testDefenderL1Bot();
+        //testDefenderL1Bot();
+        testOffensiveL1Bot();
 
     }
 }

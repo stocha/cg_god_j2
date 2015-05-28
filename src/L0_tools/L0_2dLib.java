@@ -84,6 +84,12 @@ public class L0_2dLib {
             
             return res;            
         }
+        
+        public void setAsBarycentre(WithCoord a, double ad, WithCoord b, double bd){
+            double sum=ad+bd;
+            x=ad*a.x() / sum+bd*b.x()/sum;
+            y=ad*a.y() /sum +bd*b.y() /sum;
+        }
     }
     
 }
