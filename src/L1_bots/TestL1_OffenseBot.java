@@ -24,7 +24,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         List<L0_2dLib.WithCoord> spaceGeom = null;
 
         public void inputZonePostTrait() {
-            sortedRzz = buildRZoneZone().setDistance().stream().sorted(byDistrzz.reversed()).collect(Collectors.toList());
+            sortedRzz = buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
         }
 
         public class DroneInfo {
@@ -100,7 +100,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         }
 
         public void opportunistAttack(boolean[] doneBot) {
-            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
             buildDroneZoneInfo();
 
             List<Drone> done = new ArrayList<>(D);
@@ -229,7 +229,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         }
 
         public void defenseDoing(boolean[] doneBot) {
-            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
             buildDroneZoneInfo();
 
             List<Drone> done = new ArrayList<>(D);

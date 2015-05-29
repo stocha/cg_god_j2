@@ -10,6 +10,7 @@ import L0_tools.L0_2dLib;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -45,6 +46,9 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
     RZoneDroneSet rzdStruct=null;
     
     boolean init=false;
+    
+    Random rand=new Random(D*Z*_me.id*8389);
+    int fixRa=rand.nextInt()&0xFFFF;
 
     @Override
     public void inputZones(List<L0_2dLib.Point> xyZ) {
@@ -102,19 +106,107 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
         
     }
     
+    public class ThreatLevel{
+        private int [][] t=new int[P][50];
+        int sp=1;
+        
+        public ThreatLevel reset(){
+            sp=1;
+            for(int p=0;p<P;p++){
+                t[p][0]=0;
+            }    
+            return this;
+        }
+        
+        private void increastLevelTo(int level){
+            if(level > 45) return;
+            while(sp<level+1){
+                for(int p=0;p<P;p++){
+                    t[p][sp]=t[p][sp-1];
+                }
+                sp++;
+            }
+        }
+        
+        public void addThreat(Drone d, int level){
+            if(level >45) return;
+            System.err.println("Add threat "+d+" level "+level);
+            
+            increastLevelTo(level+1);
+            t[d.owner.id][level+1]++;
+            
+        }
+        
+        public int getThreatAt(PlayerAI p,int level){
+            return t[p.id][level+1];
+        }
+        
+        public int getMaxThreatAt(int level){
+            
+            int max=-1;
+            for(int i=0;i<P;i++){
+                if(t[i][level+1]<max){
+                    max++;
+                }
+            }
+            return max;
+        }
+
+        @Override
+        public String toString() {
+            String res="\n";
+            
+            for(int i=0;i<P;i++){
+                for(int level=0;level < sp;level++){
+                    res+="|"+t[i][level];
+
+                }
+                res+="\n";
+            }
+            
+            
+            return res;
+        }
+        
+        
+    
+    }
+    
     public void defendMonoworld(){
+        
+        List<RZoneDrone> rzb=rzdStruct.stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+
+        HashMap<Zone,ThreatLevel> threat=new HashMap<>(Z);
+        for(Zone z : _zone){
+            threat.put(z, new ThreatLevel().reset());
+        }
+        
+        int cpThreat=0;
+        
+        for(RZoneDrone r : rzb){
+            if(r.z.owner!=_me) continue;
+            if(r.d.owner==_me) continue;
+            threat.get(r.z).addThreat(r.d, r.level);
+        }
+        
+        for(Zone z : _zone){
+            if(z.owner==_me){
+                System.err.println(""+z+threat.get(z));
+            
+            }
+        }
         
     }
     
     public void attackOpportunist(){
-        for(PlayerAI p: _player){
+        _player.add(_nullPlayer);
+        for(PlayerAI p: _player ){
             //System.err.println(""+p+" "+p.owned+" _me is "+_me);
             if(p==_me) continue;
             
-            Zone targ=null;
             if(p.owned.size()>0){
                 for(Drone d :attDrones){
-                    _order.put(d, p.owned.get(0).cor);
+                    _order.put(d, p.owned.get(fixRa%p.owned.size()).cor);
                     //System.err.println("Attacking "+p.owned.get(0));
                 
                 }
@@ -123,6 +215,7 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
             }
         
         }
+        _player.remove(_nullPlayer);
         
     }
     

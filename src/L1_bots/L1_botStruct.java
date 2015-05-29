@@ -58,11 +58,11 @@ public class L1_botStruct {
 
     public static class BotBase {
 
-        public static class ByPlayerRzd implements Comparator<RZoneDrone> {
+        public static class CompByPlayerRzd implements Comparator<RZoneDrone> {
 
             final int firstPlayer;
 
-            public ByPlayerRzd(int firstPlayer) {
+            public CompByPlayerRzd(int firstPlayer) {
                 this.firstPlayer = firstPlayer;
             }
 
@@ -218,7 +218,7 @@ public class L1_botStruct {
 
         }
 
-        Comparator<RZoneZone> byDistrzz = (e1, e2) -> {
+        Comparator<RZoneZone> comp_zz_bydist = (e1, e2) -> {
             return (int) (e2.distance - e1.distance);
         };
 
@@ -371,7 +371,6 @@ public class L1_botStruct {
             for (int p = 0; p < P; p++) {
                 _player.add(new PlayerAI(p));
             }
-            _player.add(_nullPlayer);
             _me = _player.get(Id);
 
             _zone = new ArrayList<>(Z);
@@ -381,7 +380,7 @@ public class L1_botStruct {
 
             _drone = new HashMap<>(P);
 
-            for (PlayerAI p : _player) {
+            for (PlayerAI p : _player) {                
                 List<Drone> bbl = new ArrayList<>(D);
                 for (int d = 0; d < D; d++) {
                     Drone bb = new Drone(p, d);
@@ -399,7 +398,7 @@ public class L1_botStruct {
             res = new ArrayList<>(D);
             for (int d = 0; d < D; d++) {
                 res.add(new L0_2dLib.Point());
-            }
+            }          
         }
 
         public void inputZones(List<L0_2dLib.Point> xyZ) {

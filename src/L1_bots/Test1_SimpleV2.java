@@ -10,7 +10,9 @@ import L0_tools.L0_2dLib;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -106,15 +108,18 @@ public class Test1_SimpleV2  extends L1_botStruct.BotBase {
         
     }
     
+    Random rand=new Random(D*Z*_me.id*8389);
+    int fixRa=rand.nextInt()&0xFFFF;    
+    
     public void attack(){
-        for(PlayerAI p: _player){
+        _player.add(_nullPlayer);
+        for(PlayerAI p: _player ){
             //System.err.println(""+p+" "+p.owned+" _me is "+_me);
             if(p==_me) continue;
             
-            Zone targ=null;
             if(p.owned.size()>0){
                 for(Drone d :attDrones){
-                    _order.put(d, p.owned.get(0).cor);
+                    _order.put(d, p.owned.get(fixRa%p.owned.size()).cor);
                     //System.err.println("Attacking "+p.owned.get(0));
                 
                 }
@@ -123,6 +128,7 @@ public class Test1_SimpleV2  extends L1_botStruct.BotBase {
             }
         
         }
+        _player.remove(_nullPlayer);
         
     }
     

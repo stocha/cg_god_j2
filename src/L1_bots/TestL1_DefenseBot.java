@@ -57,7 +57,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         
         private void buildDroneZoneInfo() {
             
-            sortedRzd= _buildRZoneDrone().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList())            ;
+            sortedRzd= _buildRZoneDrone().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(_me.id).reversed())).collect(Collectors.toList())            ;
             
             for (PlayerAI p : _player) {
                 for (Drone d : _drone.get(p)) {
@@ -158,6 +158,8 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
     }
     
     public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL1_DefenseBot(P1, Id1, D1, Z1);
+    
+    
     
     @Override
     public List<L0_2dLib.Point> outorders() {
