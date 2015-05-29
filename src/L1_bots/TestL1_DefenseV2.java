@@ -102,11 +102,11 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
         
     }
     
-    public void defend(){
+    public void defendMonoworld(){
         
     }
     
-    public void attack(){
+    public void attackOpportunist(){
         for(PlayerAI p: _player){
             //System.err.println(""+p+" "+p.owned+" _me is "+_me);
             if(p==_me) continue;
@@ -142,8 +142,8 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
         rzdStruct.setDistanceCalc();                
         //System.err.println("generating orders "+_turnNumber);
         conquestTest();
-        defend();
-        attack();
+        defendMonoworld();
+        attackOpportunist();
         
         //debug_attackplan();
 
