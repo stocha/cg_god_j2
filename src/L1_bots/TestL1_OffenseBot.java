@@ -100,7 +100,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         }
 
         public void opportunistAttack(boolean[] doneBot) {
-            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
             buildDroneZoneInfo();
 
             List<Drone> done = new ArrayList<>(D);
@@ -229,7 +229,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         }
 
         public void defenseDoing(boolean[] doneBot) {
-            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
             buildDroneZoneInfo();
 
             List<Drone> done = new ArrayList<>(D);
@@ -285,7 +285,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
                 doneBot[i] = false;
             }
 
-            if (_controled.get(_me).size() < 1) {
+            if (_me.owned.size() < 1) {
                 opportunistAttack(doneBot);
                 offenseSplit(doneBot);
             } else {

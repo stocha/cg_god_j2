@@ -134,11 +134,11 @@ public class L1_botStruct {
 
         }
 
-        Comparator<RZoneDrone> byDist = (e1, e2) -> {
+        Comparator<RZoneDrone> comp_rzd_byDist = (e1, e2) -> {
             return (int) (e2.dist - e1.dist);
         };
 
-        Comparator<RZoneDrone> byLevel = (e1, e2) -> {
+        Comparator<RZoneDrone> comp_rzd_byLevel = (e1, e2) -> {
             return (int) (e2.level - e1.level);
 
         };
@@ -334,6 +334,7 @@ public class L1_botStruct {
 
             final int id;
             int score = 0;
+            List<Zone> owned=new ArrayList<>(Z);
 
             public PlayerAI(int id) {
                 this.id = id;
@@ -356,7 +357,6 @@ public class L1_botStruct {
         final List<PlayerAI> _player;
         final List<Zone> _zone;
         final HashMap<PlayerAI, List<Drone>> _drone;
-        final HashMap<PlayerAI, List<Zone>> _controled;
         final HashMap<Drone, L0_2dLib.Point> _order;
         int _turnNumber = 0;
         private final List<L0_2dLib.Point> res;
@@ -368,6 +368,7 @@ public class L1_botStruct {
             this.Z = Z;
 
             _player = new ArrayList<>(P);
+            _player.add(_nullPlayer);
             for (int p = 0; p < P; p++) {
                 _player.add(new PlayerAI(p));
             }
@@ -389,12 +390,6 @@ public class L1_botStruct {
                 _drone.put(p, bbl);
 
             }
-
-            _controled = new HashMap<>(P);
-            for (PlayerAI p : _player) {
-                _controled.put(p, new ArrayList<>());
-            }
-            _controled.put(_nullPlayer, new ArrayList<>());
 
             _order = new HashMap<>(D);
             for (Drone d : _drone.get(_me)) {
@@ -420,7 +415,7 @@ public class L1_botStruct {
         public void inputTurnZonesOwner(int[] owners) {
 
             for (PlayerAI p : _player) {
-                _controled.get(p).clear();
+                p.owned.clear();
             }
             for (Zone z : _zone) {
                 if (owners[z.id] == -1) {
@@ -429,7 +424,7 @@ public class L1_botStruct {
                     z.owner = _player.get(owners[z.id]);
                 }
 
-                _controled.get(z.owner).add(z);
+                z.owner.owned.add(z);
             }
         }
 

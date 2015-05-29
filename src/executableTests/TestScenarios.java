@@ -5,6 +5,7 @@ import L1_bots.L1_botStruct;
 import L1_bots.TestL1_SwarmBot;
 import java.util.List;
 import L0_tools.L0_2dLib;
+import L1_bots.Test1_SimpleV2;
 import L1_bots.TestL1_DefenseBot;
 import L1_bots.TestL1_GreedyBot;
 import L1_bots.TestL1_OffenseBot;
@@ -62,6 +63,35 @@ public class TestScenarios {
             }        
         
     }
+    
+   public static void testV2Simple(){
+ 
+        //WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        //WorldBase w=new WorldBase(5, 4, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot.fact));
+        //WorldBase w=new WorldBase(9, 4, 9937777,new TesterBot(TestL1_DefenseBot.fact),new TesterBot(TestL1_GreedyBot.fact));
+        WorldBase w=new WorldBase(3, 4, 9937777,new TesterBot(Test1_SimpleV2.fact),new TesterBot(TestL1_DefenseBot.fact));
+        
+        w.genWorld();
+        
+        int nbturn=20;
+        int pas=0;
+        
+        Thread genIt=new Thread(){
+
+            @Override
+            public void run() {
+                for(int i=0;i<nbturn;i++){
+                    w.genTurn();
+                }  
+            }
+            
+            
+        };        
+        genIt.start();
+        
+        create(w);                
+        
+    }            
     
     public static void testOffensiveL1Bot(){
  
@@ -228,7 +258,8 @@ public class TestScenarios {
     
     public static void main (String[] args){
         //testDefenderL1Bot();
-        testOffensiveL1Bot();
+        //testOffensiveL1Bot();
+        testV2Simple();
 
     }
 }
