@@ -212,7 +212,7 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
             if(p.owned.size()>0){
                 for(Drone d :attDrones){
                     _order.put(d, p.owned.get(fixRa%p.owned.size()).cor);
-                    //System.err.println("Attacking "+p.owned.get(0));
+                    System.err.println("Attacking "+ p.owned.get(fixRa%p.owned.size())+" fixed "+fixRa+"  size "+p.owned.size());
                 
                 }
                 break;

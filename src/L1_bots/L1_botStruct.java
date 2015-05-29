@@ -416,6 +416,7 @@ public class L1_botStruct {
             for (PlayerAI p : _player) {
                 p.owned.clear();
             }
+            _nullPlayer.owned.clear();
             for (Zone z : _zone) {
                 if (owners[z.id] == -1) {
                     z.owner = _nullPlayer;
