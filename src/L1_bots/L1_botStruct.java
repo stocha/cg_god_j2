@@ -57,35 +57,40 @@ public class L1_botStruct {
     }
 
     public static class BotBase {
-        
-            public static class  ByPlayerRzd implements Comparator<RZoneDrone>{
-                final int firstPlayer;
+
+        public static class ByPlayerRzd implements Comparator<RZoneDrone> {
+
+            final int firstPlayer;
 
             public ByPlayerRzd(int firstPlayer) {
                 this.firstPlayer = firstPlayer;
             }
-                
-                
 
-                @Override
-                public int compare(RZoneDrone e1, RZoneDrone e2) {
-                    int o1=e1.d.owner.id;
-                    int o2=e2.d.owner.id;
-                    
-                    if(o1==o2) return 0;
-                    if(o1==firstPlayer) return -1;
-                    if(o2==firstPlayer) return 1;
-                    
-                                    return (int) (o2-o1);
+            @Override
+            public int compare(RZoneDrone e1, RZoneDrone e2) {
+                int o1 = e1.d.owner.id;
+                int o2 = e2.d.owner.id;
+
+                if (o1 == o2) {
+                    return 0;
                 }
-            }             
+                if (o1 == firstPlayer) {
+                    return -1;
+                }
+                if (o2 == firstPlayer) {
+                    return 1;
+                }
+
+                return (int) (o2 - o1);
+            }
+        }
 
         public class RZoneDrone {
 
             final Zone z;
             final Drone d;
             double dist;
-            int level;            
+            int level;
 
             public RZoneDrone(Zone z, Drone d) {
                 this.z = z;
@@ -107,38 +112,36 @@ public class L1_botStruct {
             @Override
             public String toString() {
                 return "Rzd{" + "z=" + z + ", d=" + d + ", " + dist + ", L=" + level + '}';
-            }                  
+            }
 
         }
-        
-        public class RZoneDroneSet{
-            final List<RZoneDrone> s= new ArrayList<>(D*P*Z);
 
-            final public RZoneDroneSet setDistanceCalc(){
+        public class RZoneDroneSet {
+
+            final List<RZoneDrone> s = new ArrayList<>(D * P * Z);
+
+            final public RZoneDroneSet setDistanceCalc() {
                 for (RZoneDrone r : s) {
                     r.dist = r.z.dist(r.d);
-                    r.level=(int)(r.dist-1) /100;
-                }        
+                    r.level = (int) (r.dist - 1) / 100;
+                }
                 return this;
-            }     
+            }
 
             public Stream<RZoneDrone> stream() {
                 return s.stream();
             }
-            
-            
-        
+
         }
-    
+
         Comparator<RZoneDrone> byDist = (e1, e2) -> {
             return (int) (e2.dist - e1.dist);
         };
-        
+
         Comparator<RZoneDrone> byLevel = (e1, e2) -> {
-                return (int) (e2.level - e1.level);
+            return (int) (e2.level - e1.level);
 
-
-        };                              
+        };
 
         final public RZoneDroneSet _buildRZoneDrone() {
             RZoneDroneSet res = new RZoneDroneSet();
@@ -150,10 +153,94 @@ public class L1_botStruct {
                         res.s.add(rzd);
                     }
                 }
-            }                
+            }
             return res;
-        }       
+        }
 
+        public class RZoneZone implements L0_2dLib.WithCoord {
+
+            final Zone a;
+            final Zone b;
+            double distance;
+            int level;
+            PlayerAI owner;
+
+            public RZoneZone(Zone a, Zone b) {
+                this.a = a;
+                this.b = b;
+            }
+
+            final L0_2dLib.Point coord = new L0_2dLib.Point();
+
+            public double x() {
+                return coord.x();
+            }
+
+            public double y() {
+                return coord.y();
+            }
+
+            public void set(L0_2dLib.WithCoord c) {
+                throw new RuntimeException("no");
+            }
+
+            public void set(double x, double y) {
+                throw new RuntimeException("no");
+            }
+
+            @Override
+            public String toString() {
+                return "RZoneZone{" + "" + a + ", " + b + ", d=" + distance + "," + coord + '}';
+            }
+        }
+
+        public class RZoneZoneSet {
+
+            List<RZoneZone> s = new ArrayList<>(Z * Z);
+
+            final public RZoneZoneSet setDistance() {
+                for (RZoneZone r : s) {
+                    r.distance = r.a.dist(r.b);
+                    r.coord.setAsBarycentre(r.a, 1, r.b, 1);
+                    r.level = (int) (r.distance - 1) / 100;
+                    if (r.a.owner == r.b.owner) {
+                        r.owner = r.a.owner;
+                    } else {
+                        r.owner = _nullPlayer;
+                    }
+                }
+                return this;
+            }
+
+            public Stream<RZoneZone> stream() {
+                return s.stream();
+            }
+
+        }
+
+        Comparator<RZoneZone> byDistrzz = (e1, e2) -> {
+            return (int) (e2.distance - e1.distance);
+        };
+
+        final public RZoneZoneSet buildRZoneZone() {
+            RZoneZoneSet res = new RZoneZoneSet();
+            boolean[] zdone = new boolean[Z];
+            for (int i = 0; i < Z; i++) {
+                zdone[i] = false;
+            }
+
+            for (Zone a : _zone) {
+                zdone[a.id] = true;
+                for (Zone b : _zone) {
+                    if (zdone[b.id]) {
+                        continue;
+                    }
+                    res.s.add(new RZoneZone(a, b));
+                }
+            }
+            return res;
+
+        }
 
         public class Zone implements L0_2dLib.WithCoord {
 

@@ -7,7 +7,6 @@ package L1_bots;
 
 import L0_tools.L0_2dLib;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,141 +21,10 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
 
         List<L1_botStruct.BotBase.RZoneDrone> sortedRzd = null;
         List<RZoneZone> sortedRzz = null;
-        List<RZoneB> sortedRzb = null;
         List<L0_2dLib.WithCoord> spaceGeom = null;
 
         public void inputZonePostTrait() {
-            List<RZoneZone> rzz = buildRZoneZone();
-            rZoneZone_setDistance(rzz);
-            sortedRzz = rzz.stream().sorted(byDistrzz.reversed()).collect(Collectors.toList());
-
-            List<RZoneB> rzb = buildRZoneB(sortedRzz);
-            rZoneB_setDistance(rzb);
-            sortedRzb = rzb.stream().sorted(byDistrzb.reversed()).collect(Collectors.toList());
-        }
-
-        public class RZoneB implements L0_2dLib.WithCoord {
-
-            final Zone a;
-            final RZoneZone b;
-
-            public RZoneB(Zone a, RZoneZone b) {
-                this.a = a;
-                this.b = b;
-            }
-
-            double distance;
-            final L0_2dLib.Point coord = new L0_2dLib.Point();
-
-            public double x() {
-                return coord.x();
-            }
-
-            public double y() {
-                return coord.y();
-            }
-
-            public void set(L0_2dLib.WithCoord c) {
-                throw new RuntimeException("no");
-            }
-
-            public void set(double x, double y) {
-                throw new RuntimeException("no");
-            }
-
-            @Override
-            public String toString() {
-                return "RZoneB{" + "" + a + ", " + b + ", d=" + distance + "," + coord + '}';
-            }
-
-        }
-
-        Comparator<RZoneB> byDistrzb = (e1, e2) -> {
-            return (int) (e2.distance - e1.distance);
-        };
-
-        public class RZoneZone implements L0_2dLib.WithCoord {
-
-            final Zone a;
-            final Zone b;
-
-            public RZoneZone(Zone a, Zone b) {
-                this.a = a;
-                this.b = b;
-            }
-
-            double distance;
-            final L0_2dLib.Point coord = new L0_2dLib.Point();
-
-            public double x() {
-                return coord.x();
-            }
-
-            public double y() {
-                return coord.y();
-            }
-
-            public void set(L0_2dLib.WithCoord c) {
-                throw new RuntimeException("no");
-            }
-
-            public void set(double x, double y) {
-                throw new RuntimeException("no");
-            }
-
-            @Override
-            public String toString() {
-                return "RZoneZone{" + "" + a + ", " + b + ", d=" + distance + "," + coord + '}';
-            }
-        }
-
-        Comparator<RZoneZone> byDistrzz = (e1, e2) -> {
-            return (int) (e2.distance - e1.distance);
-        };
-
-        final public List<RZoneZone> buildRZoneZone() {
-            List<RZoneZone> res = new ArrayList<>(Z * Z);
-            boolean[] zdone = new boolean[Z];
-            for (int i = 0; i < Z; i++) {
-                zdone[i] = false;
-            }
-
-            for (Zone a : _zone) {
-                zdone[a.id] = true;
-                for (Zone b : _zone) {
-                    if (zdone[b.id]) {
-                        continue;
-                    }
-                    res.add(new RZoneZone(a, b));
-                }
-            }
-            return res;
-
-        }
-
-        final public List<RZoneB> buildRZoneB(List<RZoneZone> bar) {
-            List<RZoneB> res = new ArrayList<>(Z * Z);
-
-            for (Zone a : _zone) {
-                for (RZoneZone b : bar) {
-                    res.add(new RZoneB(a, b));
-                }
-            }
-            return res;
-        }
-
-        final public void rZoneZone_setDistance(List<RZoneZone> in) {
-            for (RZoneZone r : in) {
-                r.distance = r.a.dist(r.b);
-                r.coord.setAsBarycentre(r.a, 1, r.b, 1);
-            }
-        }
-
-        final public void rZoneB_setDistance(List<RZoneB> in) {
-            for (RZoneB r : in) {
-                r.distance = r.a.dist(r.b);
-                r.coord.setAsBarycentre(r.a, 1, r.b, 1);
-            }
+            sortedRzz = buildRZoneZone().setDistance().stream().sorted(byDistrzz.reversed()).collect(Collectors.toList());
         }
 
         public class DroneInfo {
