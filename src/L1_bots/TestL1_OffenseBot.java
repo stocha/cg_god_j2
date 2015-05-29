@@ -232,7 +232,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         }
 
         public void opportunistAttack(boolean[] doneBot) {
-            sortedRzd = _rzonedrone.stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
             buildDroneZoneInfo();
 
             List<Drone> done = new ArrayList<>(D);
@@ -361,7 +361,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         }
 
         public void defenseDoing(boolean[] doneBot) {
-            sortedRzd = _rzonedrone.stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+            sortedRzd = _buildRZoneDrone().setDistanceCalc().stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
             buildDroneZoneInfo();
 
             List<Drone> done = new ArrayList<>(D);

@@ -34,7 +34,7 @@ public class TestL1_GreedyBot extends L1_botStruct.BotBase {
         
         HashMap<Drone,Boolean> droneDone=new HashMap(D);
         
-        for(RZoneDrone rzd : _rzonedrone.stream().sorted(byDist.reversed()).collect(Collectors.toList())){
+        for(RZoneDrone rzd : _buildRZoneDrone().setDistanceCalc().stream().sorted(byDist.reversed()).collect(Collectors.toList())){
            // System.err.println(""+rzd);
             
             if(rzd.d.owner==_me && !droneDone.containsKey(rzd.d) && rzd.z.owner!=_me){

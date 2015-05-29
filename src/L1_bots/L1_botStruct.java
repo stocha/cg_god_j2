@@ -14,6 +14,7 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 /**
  *
@@ -83,6 +84,8 @@ public class L1_botStruct {
 
             final Zone z;
             final Drone d;
+            double dist;
+            int level;            
 
             public RZoneDrone(Zone z, Drone d) {
                 this.z = z;
@@ -101,14 +104,30 @@ public class L1_botStruct {
                 return dist;
             }
 
-            double dist;
-            int level;
-
             @Override
             public String toString() {
                 return "Rzd{" + "z=" + z + ", d=" + d + ", " + dist + ", L=" + level + '}';
             }                  
 
+        }
+        
+        public class RZoneDroneSet{
+            final List<RZoneDrone> s= new ArrayList<>(D*P*Z);
+
+            final public RZoneDroneSet setDistanceCalc(){
+                for (RZoneDrone r : s) {
+                    r.dist = r.z.dist(r.d);
+                    r.level=(int)(r.dist-1) /100;
+                }        
+                return this;
+            }     
+
+            public Stream<RZoneDrone> stream() {
+                return s.stream();
+            }
+            
+            
+        
         }
     
         Comparator<RZoneDrone> byDist = (e1, e2) -> {
@@ -119,36 +138,21 @@ public class L1_botStruct {
                 return (int) (e2.level - e1.level);
 
 
-        };          
-        
-        Comparator<RZoneDrone> byPlayer = (e1, e2) -> {
-                return (int) (e2.d.owner.id  - e1.d.owner.id);
+        };                              
 
-
-        };                       
-
-        final public List<RZoneDrone> buildRZoneDrone() {
-            List<RZoneDrone> res = new ArrayList<>(D * P * Z);
+        final public RZoneDroneSet _buildRZoneDrone() {
+            RZoneDroneSet res = new RZoneDroneSet();
 
             for (Zone z : _zone) {
                 for (PlayerAI p : _player) {
                     for (Drone d : _drone.get(p)) {
                         RZoneDrone rzd = new RZoneDrone(z, d);
-                        res.add(rzd);
+                        res.s.add(rzd);
                     }
                 }
-            }
-            
-    
+            }                
             return res;
-        }
-        
-        private void rZoneDrone_setDistanceCalc(){
-            for (RZoneDrone r : _rzonedrone) {
-                r.dist = r.z.dist(r.d);
-                r.level=(int)(r.dist-1) /100;
-            }                    
-        }
+        }       
 
 
         public class Zone implements L0_2dLib.WithCoord {
@@ -270,8 +274,6 @@ public class L1_botStruct {
         int _turnNumber = 0;
         private final List<L0_2dLib.Point> res;
 
-        final List<RZoneDrone> _rzonedrone;
-
         public BotBase(int P, int Id, int D, int Z) {
             this.P = P;
             this.Id = Id;
@@ -316,8 +318,6 @@ public class L1_botStruct {
             for (int d = 0; d < D; d++) {
                 res.add(new L0_2dLib.Point());
             }
-
-            _rzonedrone = buildRZoneDrone();
         }
 
         public void inputZones(List<L0_2dLib.Point> xyZ) {
@@ -351,8 +351,6 @@ public class L1_botStruct {
             for (Drone d : _drone.get(pp)) {
                 d.set(xyZ.get(d.id));
             }
-            
-            rZoneDrone_setDistanceCalc();       
         }
 
         public List<L0_2dLib.Point> outorders() {

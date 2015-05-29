@@ -56,7 +56,8 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
         }
         
         private void buildDroneZoneInfo() {
-            sortedRzd= _rzonedrone.stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList())            ;
+            
+            sortedRzd= _buildRZoneDrone().stream().sorted(byLevel.reversed().thenComparing(new ByPlayerRzd(_me.id).reversed())).collect(Collectors.toList())            ;
             
             for (PlayerAI p : _player) {
                 for (Drone d : _drone.get(p)) {
@@ -81,7 +82,7 @@ public class TestL1_DefenseBot extends L1_botStruct.BotBase {
             
             HashMap<Drone, Boolean> droneDone = new HashMap(D);
             
-            for (RZoneDrone rzd : _rzonedrone.stream().sorted(byDist.reversed()).collect(Collectors.toList())) {
+            for (RZoneDrone rzd : _buildRZoneDrone().setDistanceCalc().stream().sorted(byDist.reversed()).collect(Collectors.toList())) {
                 // System.err.println(""+rzd);
 
                 if (rzd.d.owner == _me && !droneDone.containsKey(rzd.d) && rzd.z.owner != _me) {
