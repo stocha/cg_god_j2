@@ -368,10 +368,10 @@ public class L1_botStruct {
             this.Z = Z;
 
             _player = new ArrayList<>(P);
-            _player.add(_nullPlayer);
             for (int p = 0; p < P; p++) {
                 _player.add(new PlayerAI(p));
             }
+            _player.add(_nullPlayer);
             _me = _player.get(Id);
 
             _zone = new ArrayList<>(Z);

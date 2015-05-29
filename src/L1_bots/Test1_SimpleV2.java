@@ -57,21 +57,29 @@ public class Test1_SimpleV2  extends L1_botStruct.BotBase {
         rzdStruct=_buildRZoneDrone();
     }
     
-    public void conquestTest(){                
+    public void conquestTest(){         
+        //System.err.println("owned prev "+ownedPrev);
         for(Zone z : _zone){
+
             if(ownedPrev.get(z) != (z.owner==_me)){
                 if(z.owner==_me){
                     //conquest
+                   // System.err.println("Conquest "+z);
+                    
+                    int defd=DronePerPlanet;
                     for(RZoneDrone rzd : rzdStruct.stream()
                             .filter(e->e.d.owner==_me && attDrones.contains(e.d) && e.z==z)
                             .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList())){
                         
                         zoneDefInfo.get(z).defDrone.add(rzd.d);
+                        defd--;
+                        if(defd==0) break;
                     }
                     attDrones.removeAll(zoneDefInfo.get(z).defDrone);
                 
                 }else{
                     // lost
+                    //System.err.println("Lost "+z);
                     attDrones.addAll(zoneDefInfo.get(z).defDrone);
                     zoneDefInfo.get(z).defDrone.clear();
                     
@@ -94,8 +102,27 @@ public class Test1_SimpleV2  extends L1_botStruct.BotBase {
         
     }
     
-    public void attack(){
+    public void defend(){
         
+    }
+    
+    public void attack(){
+        for(PlayerAI p: _player){
+            //System.err.println(""+p+" "+p.owned+" _me is "+_me);
+            if(p==_me) continue;
+            
+            Zone targ=null;
+            if(p.owned.size()>0){
+                for(Drone d :attDrones){
+                    _order.put(d, p.owned.get(0).cor);
+                    //System.err.println("Attacking "+p.owned.get(0));
+                
+                }
+                break;
+                
+            }
+        
+        }
         
     }
     
@@ -113,9 +140,12 @@ public class Test1_SimpleV2  extends L1_botStruct.BotBase {
             }
         }
         rzdStruct.setDistanceCalc();                
-        System.err.println("generating orders "+_turnNumber);
+        //System.err.println("generating orders "+_turnNumber);
         conquestTest();
-        debug_attackplan();
+        defend();
+        attack();
+        
+        //debug_attackplan();
 
         
         

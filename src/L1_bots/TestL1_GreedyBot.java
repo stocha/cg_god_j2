@@ -27,7 +27,7 @@ public class TestL1_GreedyBot extends L1_botStruct.BotBase {
     public List<L0_2dLib.Point> outorders() {
         
         
-        System.err.println("generating orders "+_turnNumber);
+        //System.err.println("generating orders "+_turnNumber);
 
         L1_botStruct.BotBase.Zone cible=null;
         
@@ -39,7 +39,7 @@ public class TestL1_GreedyBot extends L1_botStruct.BotBase {
             
             if(rzd.d.owner==_me && !droneDone.containsKey(rzd.d) && rzd.z.owner!=_me){
                 _order.get(rzd.d).set(rzd.z);
-                System.err.println(""+rzd.d+" is heading to "+rzd.z);
+                //System.err.println(""+rzd.d+" is heading to "+rzd.z);
                 droneDone.put(rzd.d, true);
             }        
         }
