@@ -145,8 +145,8 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
             
             int max=-1;
             for(int i=0;i<P;i++){
-                if(t[i][level+1]<max){
-                    max++;
+                if(t[i][level+1]>max){
+                    max=t[i][level+1];
                 }
             }
             return max;
@@ -163,6 +163,11 @@ public class TestL1_DefenseV2  extends L1_botStruct.BotBase {
                 }
                 res+="\n";
             }
+            
+           for(int level=0;level < sp-1;level++){
+               res+="|"+getMaxThreatAt(level);
+           }
+           res+="\n";
             
             
             return res;
