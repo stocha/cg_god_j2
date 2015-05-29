@@ -79,29 +79,6 @@ public class L1_botStruct {
                 }
             }             
 
-        public class RDroneDrone {
-
-            final Drone friend;
-            final Drone foe;
-
-            public RDroneDrone(Drone friend, Drone foe) {
-                this.friend = friend;
-                this.foe = foe;
-            }
-
-            public double getDist() {
-                return dist;
-            }
-
-            double dist;
-
-            @Override
-            public String toString() {
-                return "Rdd{" + "f=" + friend + ", e=" + foe + ", dist=" + dist + '}';
-            }
-
-        }
-
         public class RZoneDrone {
 
             final Zone z;
@@ -148,11 +125,7 @@ public class L1_botStruct {
                 return (int) (e2.d.owner.id  - e1.d.owner.id);
 
 
-        };          
-        
-        Comparator<RDroneDrone> rDroneDronebyDist = (e1, e2) -> {
-            return (int) (e2.dist - e1.dist);
-        };        
+        };                       
 
         final public List<RZoneDrone> buildRZoneDrone() {
             List<RZoneDrone> res = new ArrayList<>(D * P * Z);
@@ -174,27 +147,6 @@ public class L1_botStruct {
             for (RZoneDrone r : _rzonedrone) {
                 r.dist = r.z.dist(r.d);
                 r.level=(int)(r.dist-1) /100;
-            }                    
-        }
-
-        final public List<RDroneDrone> buildRDroneDrone() {
-            List<RDroneDrone> res = new ArrayList<>(D * D *P);
-            
-            for (Drone m : _drone.get(_me)) {
-                for (PlayerAI p : _player) {
-                    if(p==_me) continue;
-                    for (Drone d : _drone.get(p)) {
-                        RDroneDrone rzd = new RDroneDrone(m, d);
-                        res.add(rzd);
-                    }
-                }
-            }            
-
-            return res;
-        }
-          final public void rDroneDrone_setDistanceCalc(List<RDroneDrone> it){
-            for (RDroneDrone r : it) {
-                r.dist = r.friend.dist(r.foe);
             }                    
         }
 
