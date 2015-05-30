@@ -313,26 +313,59 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
     
     public void attackWithDef(List<Drone> them ){
         
-        for(Drone d : them){
-                    _player.add(_nullPlayer);
-                    for (PlayerAI p : _player) {
-                        if (p == _me) {
-                            continue;
+        List<RZoneZone> zz=_buildRZoneZone().setDistance().stream().filter(
+                e->((e.a.owner==_me) || (e.b.owner==_me))&&((e.a.owner!=_me) || (e.b.owner!=_me))
+        ).sorted(comp_zz_bydist).collect(Collectors.toList());
+        
+        
+        if(zz.size()>0){
+            Zone targ=zz.get(0).a;
+            if(targ.owner==_me) targ=zz.get(0).b;
+            for(Drone d : them){
+                        _player.add(_nullPlayer);
+                        for (PlayerAI p : _player) {
+                            if (p == _me) {
+                                continue;
+                            }
+                            if (p.owned.size() > 0) {
+                                _order.get(d).set( targ.cor);
+                                System.err.println("def Attacking " + targ+"  "+them);
+                            }
                         }
-                        if (p.owned.size() > 0) {
-                            _order.get(d).set( p.owned.get(fixRa % p.owned.size()).cor);
-                            //System.err.println("free Attacking " + p.owned.get(fixRa % p.owned.size()) + " fixed " + fixRa + "  size " + p.owned.size());
-                        }
-                    }
-                    _player.remove(_nullPlayer);        
+                        _player.remove(_nullPlayer);        
+            }
         }
         
     }
     
     public void placementAttack(HashSet<Drone> inuseDrones){
+        
+        System.err.println("Placement "+attDrones+"  inuse :  "+inuseDrones);
+        
+        List<RZoneZone> zz=_buildRZoneZone().setDistance().stream().filter(
+                e->((e.a.owner==_me) || (e.b.owner==_me))&&((e.a.owner!=_me) || (e.b.owner!=_me))
+        ).sorted(comp_zz_bydist).collect(Collectors.toList());    
+        final Zone targ;
+        if(zz.size()>0){
+            Zone targProv;
+            targProv=zz.get(0).a;
+            if(targProv.owner==_me) targProv=zz.get(0).b;
+            targ=targProv;
+        } else return;
+        
+        zz=_buildRZoneZone().setDistance().stream().filter(
+                e->((e.a==targ) || (e.b==targ) &&(e.a.owner!=_me) || (e.b.owner!=_me))
+        ).sorted(comp_zz_bydist).collect(Collectors.toList());            
+        
+        if(zz.size()>0){
+        } else return;        
+        
+        System.err.println("Sending to "+zz.get(0));
         for(Drone d : attDrones){
             if(inuseDrones.contains(d)) continue;
-            _order.get(d).set(new L0_2dLib.Point(2000,400));
+            
+
+            _order.get(d).set(zz.get(0));
         }
     }
     

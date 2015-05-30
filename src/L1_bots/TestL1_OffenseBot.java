@@ -24,7 +24,7 @@ public class TestL1_OffenseBot extends L1_botStruct.BotBase {
         List<L0_2dLib.WithCoord> spaceGeom = null;
 
         public void inputZonePostTrait() {
-            sortedRzz = buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
+            sortedRzz = _buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
         }
 
         public class DroneInfo {

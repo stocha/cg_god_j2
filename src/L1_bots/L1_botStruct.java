@@ -222,7 +222,7 @@ public class L1_botStruct {
             return (int) (e2.distance - e1.distance);
         };
 
-        final public RZoneZoneSet buildRZoneZone() {
+        final public RZoneZoneSet _buildRZoneZone() {
             RZoneZoneSet res = new RZoneZoneSet();
             boolean[] zdone = new boolean[Z];
             for (int i = 0; i < Z; i++) {
