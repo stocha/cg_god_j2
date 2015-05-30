@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package L1_bots;
 
 import L0_tools.L0_2dLib;
@@ -17,13 +18,13 @@ import java.util.stream.Collectors;
  *
  * @author Jahan
  */
-public class TestL1_OffenseV2 extends L1_botStruct.BotBase {
+public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
 
-    public TestL1_OffenseV2(int P, int Id, int D, int Z) {
+    public TestL1_OffenseV2_2(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
     }
 
-    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL1_OffenseV2(P1, Id1, D1, Z1);
+    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL1_OffenseV2_2(P1, Id1, D1, Z1);
 
     int DronePerPlanet = D / 3;
     List<Drone> attDrones = new ArrayList<>(D);
@@ -68,7 +69,7 @@ public class TestL1_OffenseV2 extends L1_botStruct.BotBase {
             if (ownedPrev.get(z) != (z.owner == _me)) {
                 if (z.owner == _me) {
                     //conquest
-                     //System.err.println("Conquest "+z);
+                     System.err.println("Conquest "+z);
 
                     int defd = DronePerPlanet;
                     for (RZoneDrone rzd : rzdStruct.stream()
@@ -85,10 +86,10 @@ public class TestL1_OffenseV2 extends L1_botStruct.BotBase {
 
                 } else {
                     // lost
-                    //System.err.println("Lost "+z);
+                    System.err.println("Lost "+z);
                     attDrones.addAll(zoneDefInfo.get(z).defDrone);
                     zoneDefInfo.get(z).defDrone.clear();
-                    //System.err.println("Att drones "+attDrones);
+                    System.err.println("Att drones "+attDrones);
 
                 }
 
@@ -320,6 +321,24 @@ public class TestL1_OffenseV2 extends L1_botStruct.BotBase {
             _order.get(d).set(new L0_2dLib.Point(2000,400));
         }
     }
+    
+    public void greedyThem(HashSet<Drone> inuseDrones){
+       
+        HashSet<Drone> droneDone=new HashSet(D);
+        
+        for(RZoneDrone rzd : _buildRZoneDrone().setDistanceCalc().stream().filter((e)->e.z.owner==_nullPlayer ).sorted(comp_rzd_byDist.reversed()).collect(Collectors.toList())){
+           // System.err.println(""+rzd);
+            
+            if(rzd.d.owner==_me && !droneDone.contains(rzd.d)){//&& rzd.z.owner!=_me
+                _order.get(rzd.d).set(rzd.z);
+                System.err.println(""+rzd.d+" is heading to "+rzd.z);
+                droneDone.add(rzd.d);
+                inuseDrones.add(rzd.d);
+            }        
+        }
+            
+    
+    }
 
     public void attackOpportunist(HashSet<Drone> inuseDrones) {
 
@@ -427,10 +446,10 @@ public class TestL1_OffenseV2 extends L1_botStruct.BotBase {
         //System.err.println("generating orders "+_turnNumber);
         conquestTest();
         defendMonoworld();
-        
-        HashSet<Drone> inuseDrones = new HashSet<>();        
-        
-        attackOpportunist(inuseDrones);
+        HashSet<Drone> inuseDrones = new HashSet<>();            
+                  
+        greedyThem(inuseDrones);        
+        attackOpportunist(inuseDrones);        
         placementAttack(inuseDrones);
 
         //debug_attackplan();
