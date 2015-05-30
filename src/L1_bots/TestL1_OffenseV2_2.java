@@ -246,6 +246,8 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
         HashSet<Drone> freeDrone = new HashSet<>();
         HashSet<Drone> stuckDrone = new HashSet<>();
         HashSet<Drone> retreatDrone = new HashSet<>();
+        
+        List<Drone> freeDefender=new ArrayList<>();
 
         for (Zone z : _zone) {
             if (z.owner != _me) {
@@ -291,7 +293,27 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
             }
 
             for (Drone d : zoneDefInfo.get(z).defDrone) {
+                
                 if (freeDrone.contains(d)) {
+                    freeDefender.add(d);
+
+                } else if (retreatDrone.contains(d)) {
+                    _order.get(d).set( z.cor);
+                } else {
+                    _order.get(d).set( d.cor);
+                }
+
+            }
+
+        }// fin zone
+        
+        attackWithDef(freeDefender);
+
+    }
+    
+    public void attackWithDef(List<Drone> them ){
+        
+        for(Drone d : them){
                     _player.add(_nullPlayer);
                     for (PlayerAI p : _player) {
                         if (p == _me) {
@@ -302,17 +324,9 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
                             //System.err.println("free Attacking " + p.owned.get(fixRa % p.owned.size()) + " fixed " + fixRa + "  size " + p.owned.size());
                         }
                     }
-                    _player.remove(_nullPlayer);
-                } else if (retreatDrone.contains(d)) {
-                    _order.get(d).set( z.cor);
-                } else {
-                    _order.get(d).set( d.cor);
-                }
-
-            }
-
-        }// fin zone
-
+                    _player.remove(_nullPlayer);        
+        }
+        
     }
     
     public void placementAttack(HashSet<Drone> inuseDrones){
