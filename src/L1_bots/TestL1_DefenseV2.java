@@ -115,6 +115,15 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
 
         private int[][] t = new int[P][maxLevel+1];
         int sp = 1;
+        
+        HashMap<PlayerAI,HashMap<Integer,List<Drone>>> droneAtLevel=new HashMap<>(P);
+        {
+           for(PlayerAI p : _player){
+               droneAtLevel.put(p,new HashMap<>(maxLevel+1));              
+           }
+                
+            
+        }
 
         public ThreatLevel reset() {
             sp = 1;
@@ -141,6 +150,12 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
                 return;
             }
             //System.err.println("Add threat " + d + " level " + level);
+            
+            
+            if(droneAtLevel.get(d.owner).get(level)==null){
+                droneAtLevel.get(d.owner).put(level, new ArrayList<>(D));
+            }
+            droneAtLevel.get(d.owner).get(level).add(d);
 
             increastLevelTo(level + 1);
             t[d.owner.id][level + 1]++;
@@ -194,6 +209,7 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
                 }
                 res += "\n";
             }
+            res+=""+droneAtLevel;
 
             return res;
         }
@@ -234,7 +250,7 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         for (Zone z : _zone) {
             int[] maxThreat = threat.get(z).getMaxThreat(_me);
             if (z.owner == _me) {
-                System.err.println("" + z + threat.get(z));
+                System.err.println("" + z +"\n"+ threat.get(z));
                 System.err.println("maxthreat[] " + arrayToString(maxThreat));
 
                 List<RZoneDrone> defDrones = rzdStruct.stream().filter(e -> e.d.owner == _me && e.z == z && zoneDefInfo.get(z).defDrone.contains(e.d))
