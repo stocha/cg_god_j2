@@ -329,7 +329,7 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
                             }
                             if (p.owned.size() > 0) {
                                 _order.get(d).set( targ.cor);
-                                System.err.println("def Attacking " + targ+"  "+them);
+                                //System.err.println("def Attacking " + targ+"  "+them);
                             }
                         }
                         _player.remove(_nullPlayer);        
@@ -344,28 +344,31 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
         
         List<RZoneZone> zz=_buildRZoneZone().setDistance().stream().filter(
                 e->((e.a.owner==_me) || (e.b.owner==_me))&&((e.a.owner!=_me) || (e.b.owner!=_me))
-        ).sorted(comp_zz_bydist).collect(Collectors.toList());    
+        ).sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());    
         final Zone targ;
         if(zz.size()>0){
             Zone targProv;
             targProv=zz.get(0).a;
             if(targProv.owner==_me) targProv=zz.get(0).b;
             targ=targProv;
+            
+            System.err.println("Selected "+zz.get(0)+" targ (provi) is "+targ);
         } else return;
         
         zz=_buildRZoneZone().setDistance().stream().filter(
-                e->((e.a==targ) || (e.b==targ) &&(e.a.owner!=_me) || (e.b.owner!=_me))
-        ).sorted(comp_zz_bydist).collect(Collectors.toList());            
+                e->(((e.a==targ) || (e.b==targ)) &&((e.a.owner!=_me) && (e.b.owner!=_me)))
+        ).sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());            
         
         if(zz.size()>0){
         } else return;        
         
-        System.err.println("Sending to "+zz.get(0));
+        
+        //System.err.println("Sending to "+zz.get(0));
         for(Drone d : attDrones){
             if(inuseDrones.contains(d)) continue;
             
 
-            _order.get(d).set(zz.get(0));
+            _order.get(d).set(zz.get(0).coord);
         }
     }
     
@@ -378,7 +381,7 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
             
             if(rzd.d.owner==_me && !droneDone.contains(rzd.d)){//&& rzd.z.owner!=_me
                 _order.get(rzd.d).set(rzd.z);
-                System.err.println(""+rzd.d+" is heading to "+rzd.z);
+                //System.err.println(""+rzd.d+" is heading to "+rzd.z);
                 droneDone.add(rzd.d);
                 inuseDrones.add(rzd.d);
             }        
