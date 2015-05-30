@@ -340,7 +340,7 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
     
     public void placementAttack(HashSet<Drone> inuseDrones){
         
-        System.err.println("Placement "+attDrones+"  inuse :  "+inuseDrones);
+        //System.err.println("Placement "+attDrones+"  inuse :  "+inuseDrones);
         
         List<RZoneZone> zz=_buildRZoneZone().setDistance().stream().filter(
                 e->((e.a.owner==_me) || (e.b.owner==_me))&&((e.a.owner!=_me) || (e.b.owner!=_me))
@@ -352,7 +352,7 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
             if(targProv.owner==_me) targProv=zz.get(0).b;
             targ=targProv;
             
-            System.err.println("Selected "+zz.get(0)+" targ (provi) is "+targ);
+            //System.err.println("Selected "+zz.get(0)+" targ (provi) is "+targ);
         } else return;
         
         zz=_buildRZoneZone().setDistance().stream().filter(
