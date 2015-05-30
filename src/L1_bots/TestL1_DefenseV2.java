@@ -110,8 +110,10 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
     }
 
     public class ThreatLevel {
+        
+        public static final int maxLevel=50;
 
-        private int[][] t = new int[P][50];
+        private int[][] t = new int[P][maxLevel+1];
         int sp = 1;
 
         public ThreatLevel reset() {
@@ -123,7 +125,7 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         }
 
         private void increastLevelTo(int level) {
-            if (level > 45) {
+            if (level >= maxLevel-1) {
                 return;
             }
             while (sp < level + 1) {
@@ -135,7 +137,7 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         }
 
         public void addThreat(Drone d, int level) {
-            if (level > 45) {
+            if (level  >= maxLevel-1) {
                 return;
             }
             //System.err.println("Add threat " + d + " level " + level);
@@ -146,33 +148,37 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         }
 
         public int getThreatAt(PlayerAI p, int level) {
+            if (level  >= maxLevel-1) return t[p.id][maxLevel-1];
             return t[p.id][level + 1];
         }
 
-        public int getMaxThreatAt(int level,PlayerAI exclude) {
+        public int getMaxThreatAt(int level, PlayerAI exclude) {
+            if (level  >= maxLevel-1) return getMaxThreatAt(maxLevel-1,exclude);
 
             int max = -1;
             for (int i = 0; i < P; i++) {
-                if(i==exclude.id) continue;
+                if (i == exclude.id) {
+                    continue;
+                }
                 if (t[i][level + 1] > max) {
                     max = t[i][level + 1];
                 }
             }
             return max;
         }
-        
-        public int[] getMaxThreat(PlayerAI exclude){
-            int[] res=new int[sp-1];
-            for(int i=0;i<sp-1;i++){
-                res[i]=getMaxThreatAt(i,exclude);
+
+        public int[] getMaxThreat(PlayerAI exclude) {
+            int[] res = new int[sp - 1];
+            for (int i = 0; i < sp - 1; i++) {
+                res[i] = getMaxThreatAt(i, exclude);
             }
-            
+
             return res;
         }
 
         @Override
         public String toString() {
-            String res = "\n";
+            String res = "";
 
             for (int i = 0; i < P; i++) {
                 for (int level = 0; level < sp; level++) {
@@ -181,21 +187,23 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
                 }
                 res += "\n";
             }
-            for(PlayerAI p : _player)
-            for (int level = 0; level < sp - 1; level++) {
-                res += "|"+p+" " + getMaxThreatAt(level,p);
+            for (PlayerAI p : _player) {
+                res += "max for " + p + "\n";
+                for (int level = 0; level < sp - 1; level++) {
+                    res += "|" + (getMaxThreatAt(level, p)) + "";
+                }
+                res += "\n";
             }
-            res += "\n";
 
             return res;
         }
 
     }
-    
-    private String arrayToString(int[] it){
-        String r="";
-        for(int i=0;i<it.length;i++){
-            r+="|"+it[i];
+
+    private String arrayToString(int[] it) {
+        String r = "";
+        for (int i = 0; i < it.length; i++) {
+            r += "|" + it[i];
         }
         return r;
     }
@@ -203,7 +211,7 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
     public void defendMonoworld() {
 
         List<RZoneDrone> rzb = rzdStruct.stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
-        
+
         HashMap<Zone, ThreatLevel> threat = new HashMap<>(Z);
         for (Zone z : _zone) {
             threat.put(z, new ThreatLevel().reset());
@@ -216,28 +224,29 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         }
 
         ///-------------- Classer les defenseurs en free / stuck / retreat
-        HashSet<Drone> freeDrone=new HashSet<>();
-        HashSet<Drone> stuckDrone=new HashSet<>();
-        HashSet<Drone> retreatDrone=new HashSet<>();
+        HashSet<Drone> freeDrone = new HashSet<>();
+        HashSet<Drone> stuckDrone = new HashSet<>();
+        HashSet<Drone> retreatDrone = new HashSet<>();
+
+        List<Drone> currLevelDr = new ArrayList<>();
+        int currLevelCp;
+
         for (Zone z : _zone) {
-            int[] maxThreat=threat.get(z).getMaxThreat(_me);
+            int[] maxThreat = threat.get(z).getMaxThreat(_me);
             if (z.owner == _me) {
                 System.err.println("" + z + threat.get(z));
                 System.err.println("maxthreat[] " + arrayToString(maxThreat));
-                
-                List<RZoneDrone> defDrones = rzdStruct.stream().filter(e->e.d.owner==_me && e.z==z && zoneDefInfo.get(z).defDrone.contains(e.d))
-                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());        
-                
-                for(RZoneDrone def : defDrones){
-                    Drone d =def.d;
-                    int lvl=def.level;
 
-                }
+                List<RZoneDrone> defDrones = rzdStruct.stream().filter(e -> e.d.owner == _me && e.z == z && zoneDefInfo.get(z).defDrone.contains(e.d))
+                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
+
+                currLevelCp = threat.get(z).getThreatAt(_me, 0);
+
+
+
             }
         }
-        
-        
- 
+
     }
 
     public void attackOpportunist() {
