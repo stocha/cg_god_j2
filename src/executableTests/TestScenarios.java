@@ -70,8 +70,9 @@ public class TestScenarios {
         //WorldBase w=new WorldBase(10, 4, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_DefenseBot.fact));
         //WorldBase w=new WorldBase(5, 4, 9937777,new TesterBot(TestL1_OffenseBot.fact),new TesterBot(TestL1_DefenseBot.fact));
         //WorldBase w=new WorldBase(9, 4, 9937777,new TesterBot(TestL1_DefenseBot.fact),new TesterBot(TestL1_GreedyBot.fact));
-        WorldBase w=new WorldBase(3, 6, 9937777, new TesterBot(TestL1_DefenseV2.fact),new TesterBot(Test1_SimpleV2.fact),new TesterBot(Test1_SimpleV2.fact));
-        
+        //WorldBase w=new WorldBase(3, 6, 9937777, new TesterBot(TestL1_DefenseV2.fact),new TesterBot(Test1_SimpleV2.fact),new TesterBot(Test1_SimpleV2.fact));
+       WorldBase w=new WorldBase(7, 6, 9937777, new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_DefenseV2.fact)); 
+       
         w.genWorld();
         
         int nbturn=30;

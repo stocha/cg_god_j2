@@ -37,7 +37,7 @@ public class TestL1_GreedyBot extends L1_botStruct.BotBase {
         for(RZoneDrone rzd : _buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byDist.reversed()).collect(Collectors.toList())){
            // System.err.println(""+rzd);
             
-            if(rzd.d.owner==_me && !droneDone.containsKey(rzd.d) && rzd.z.owner!=_me){
+            if(rzd.d.owner==_me && !droneDone.containsKey(rzd.d) ){//&& rzd.z.owner!=_me
                 _order.get(rzd.d).set(rzd.z);
                 //System.err.println(""+rzd.d+" is heading to "+rzd.z);
                 droneDone.put(rzd.d, true);
