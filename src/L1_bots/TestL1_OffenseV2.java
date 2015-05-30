@@ -7,8 +7,6 @@ package L1_bots;
 
 import L0_tools.L0_2dLib;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,13 +17,13 @@ import java.util.stream.Collectors;
  *
  * @author Jahan
  */
-public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
+public class TestL1_OffenseV2 extends L1_botStruct.BotBase {
 
-    public TestL1_DefenseV2(int P, int Id, int D, int Z) {
+    public TestL1_OffenseV2(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
     }
 
-    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL1_DefenseV2(P1, Id1, D1, Z1);
+    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL1_OffenseV2(P1, Id1, D1, Z1);
 
     int DronePerPlanet = D / 3;
     List<Drone> attDrones = new ArrayList<>(D);
@@ -261,53 +259,53 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
                     .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
             int nbDrone = zoneDefInfo.get(z).defDrone.size();
             int nbDroneLeft = nbDrone;
-            for(RZoneDrone rzd : defDrones){
-                int nbUsed=nbDrone-nbDroneLeft;
-                Drone d =rzd.d;
-                int level=rzd.level;
-                int currLevelCp = maxThreat[level]; 
-                int nextLevelCp = maxThreat[level+1];
-                int futurLevelCp = maxThreat[level+2];
-                
-                
-                //System.err.println("Considering "+rzd.d+" at "+z+" level "+rzd.level+" knowing "+currLevelCp+"/ Left "+nbDroneLeft+" used "+nbUsed);
-                //if(currLevelCp> nbDrone ) System.err.println("Defense is breaking : release drones");
-                
-                if(currLevelCp<= nbUsed && nextLevelCp<=nbUsed && futurLevelCp<=nbUsed){
-                    //System.err.println(""+d+" is considred free");
+            for (RZoneDrone rzd : defDrones) {
+                int nbUsed = nbDrone - nbDroneLeft;
+                Drone d = rzd.d;
+                int level = rzd.level;
+                int currLevelCp = maxThreat[level];
+                int nextLevelCp = maxThreat[level + 1];
+                int futurLevelCp = maxThreat[level + 2];
+
+                //System.err.println("Considering " + rzd.d + " at " + z + " level " + rzd.level + " knowing " + currLevelCp + "/ Left " + nbDroneLeft + " used " + nbUsed);
+                if (currLevelCp > nbDrone) {
+                    //System.err.println("Defense is breaking : release drones");
+                }
+
+                if (currLevelCp <= nbUsed && nextLevelCp <= nbUsed && futurLevelCp <= nbUsed) {
+                    //System.err.println("" + d + " is considred free");
                     freeDrone.add(d);
-                    nbDroneLeft--;                    
-                }else
-                if(currLevelCp<= nbUsed && nextLevelCp<=nbUsed){
-                    //System.err.println(""+d+" is considred stuck");
+                    nbDroneLeft--;
+                } else if (currLevelCp <= nbUsed && nextLevelCp <= nbUsed) {
+                    //System.err.println("" + d + " is considred stuck");
                     stuckDrone.add(d);
                     nbDroneLeft--;
-                }else {
-                    //System.err.println(""+d+" is considred retreat");
+                } else {
+                    //System.err.println("" + d + " is considred retreat");
                     retreatDrone.add(d);
                     nbDroneLeft--;
-                } 
+                }
             }
-            
-            for(Drone d : zoneDefInfo.get(z).defDrone){
-                if(freeDrone.contains(d)){
+
+            for (Drone d : zoneDefInfo.get(z).defDrone) {
+                if (freeDrone.contains(d)) {
                     _player.add(_nullPlayer);
                     for (PlayerAI p : _player) {
                         if (p == _me) {
                             continue;
                         }
                         if (p.owned.size() > 0) {
-                                _order.put(d, p.owned.get(fixRa % p.owned.size()).cor);
-                                //System.err.println("free Attacking "+ p.owned.get(fixRa%p.owned.size())+" fixed "+fixRa+"  size "+p.owned.size());
+                            _order.put(d, p.owned.get(fixRa % p.owned.size()).cor);
+                            //System.err.println("free Attacking " + p.owned.get(fixRa % p.owned.size()) + " fixed " + fixRa + "  size " + p.owned.size());
                         }
                     }
-                    _player.remove(_nullPlayer);                    
-                }else if(retreatDrone.contains(d)){
+                    _player.remove(_nullPlayer);
+                } else if (retreatDrone.contains(d)) {
                     _order.put(d, z.cor);
-                }else{
-                    _order.put(d,d.cor);
+                } else {
+                    _order.put(d, d.cor);
                 }
-            
+
             }
 
         }// fin zone
@@ -315,25 +313,93 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
     }
 
     public void attackOpportunist() {
-        _player.add(_nullPlayer);
+        
+        HashSet<Drone> inuseDrones = new HashSet<>();
+
         for (PlayerAI p : _player) {
-            //System.err.println(""+p+" "+p.owned+" _me is "+_me);
-            if (p == _me) {
-                continue;
+            List<RZoneDrone> rzb = rzdStruct.stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(p.id).reversed())).collect(Collectors.toList());
+
+            HashMap<Zone, ThreatLevel> threat = new HashMap<>(Z);
+            for (Zone z : _zone) {
+                threat.put(z, new ThreatLevel().reset());
             }
 
-            if (p.owned.size() > 0) {
-                for (Drone d : attDrones) {
-                    _order.put(d, p.owned.get(fixRa % p.owned.size()).cor);
-                    //System.err.println("Attacking "+ p.owned.get(fixRa%p.owned.size())+" fixed "+fixRa+"  size "+p.owned.size());
+            int cpThreat = 0;
 
+            for (RZoneDrone r : rzb) {
+                threat.get(r.z).addThreat(r.d, r.level);
+            }
+
+            ///-------------- Classer les defenseurs en free / stuck / retreat
+            HashSet<Drone> freeDrone = new HashSet<>();
+            HashSet<Drone> stuckDrone = new HashSet<>();
+            HashSet<Drone> retreatDrone = new HashSet<>();
+            
+            List<Drone> currAttaque=new ArrayList<>(D);
+
+            for (Zone z : _zone) {
+                
+                currAttaque.clear();
+                if (z.owner != p) {
+                    continue;
                 }
-                break;
 
-            }
+                int[] maxThreat = threat.get(z).getMaxThreat(p);
+
+                //System.err.println("" + z + "\n" + threat.get(z));
+                //System.err.println("maxthreat[] " + arrayToString(maxThreat));
+
+                List<RZoneDrone> defDrones = rzdStruct.stream().filter(e -> e.d.owner == _me && e.z == z && attDrones.contains(e.d) && !inuseDrones.contains(e.d))
+                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
+                int nbDrone = attDrones.size();
+                int nbDroneLeft = nbDrone;
+                for (RZoneDrone rzd : defDrones) {
+                    int nbUsed = nbDrone - nbDroneLeft;
+                    Drone d = rzd.d;
+                    int level = rzd.level;
+                    int currLevelCp = maxThreat[level];
+                    int nextLevelCp = maxThreat[level + 1];
+                    int futurLevelCp = maxThreat[level + 2];
+                    currAttaque.add(d);
+
+                    //System.err.println("Considering " + rzd.d + " at " + z + " level " + rzd.level + " knowing " + currLevelCp + "/ Left " + nbDroneLeft + " used " + nbUsed);
+                    if (currLevelCp < nbDrone) {
+                        //System.err.println("Defense is breaking : attack drones "+currAttaque);
+                        
+                        for(Drone atd : currAttaque){
+                            _order.put(atd, z.cor);
+                            inuseDrones.add(atd);
+                            
+                        }
+                        
+                        break;
+                    }
+                }
+
+//                for (Drone d : zoneDefInfo.get(z).defDrone) {
+//                    if (freeDrone.contains(d)) {
+//                        _player.add(_nullPlayer);
+//                        for (PlayerAI p : _player) {
+//                            if (p == _me) {
+//                                continue;
+//                            }
+//                            if (p.owned.size() > 0) {
+//                                _order.put(d, p.owned.get(fixRa % p.owned.size()).cor);
+//                                System.err.println("free Attacking " + p.owned.get(fixRa % p.owned.size()) + " fixed " + fixRa + "  size " + p.owned.size());
+//                            }
+//                        }
+//                        _player.remove(_nullPlayer);
+//                    } else if (retreatDrone.contains(d)) {
+//                        _order.put(d, z.cor);
+//                    } else {
+//                        _order.put(d, d.cor);
+//                    }
+//
+//                }
+
+            }// fin zone            
 
         }
-        _player.remove(_nullPlayer);
 
     }
 
