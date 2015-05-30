@@ -111,7 +111,7 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
 
     public class ThreatLevel {
 
-        public static final int maxLevel = 50;
+        public static final int maxLevel = 70;
 
         private int[][] t = new int[P][maxLevel + 1];
         int sp = 1;
@@ -372,11 +372,39 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
         }
     }
     
-    public void greedyThem(HashSet<Drone> inuseDrones){
+    public void detectLocked(HashSet lockedWorld){
+        List<RZoneDrone> rzb = rzdStruct.stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(_me.id).reversed())).collect(Collectors.toList());
+        HashMap<Zone, ThreatLevel> threat = new HashMap<>(Z);
+        for (Zone z : _zone) {
+            threat.put(z, new ThreatLevel().reset());
+        }
+
+        int cpThreat = 0;
+
+        for (RZoneDrone r : rzb) {
+            threat.get(r.z).addThreat(r.d, r.level);
+        }        
+        
+        for(Zone z : _zone){
+            int countMax0=0;
+            int max=threat.get(z).getMaxThreat(_nullPlayer)[0];
+            ThreatLevel tl = threat.get(z);
+            for(PlayerAI p : _player){
+                if(p==_me) continue;
+                if(max==tl.getThreatAt(p, 0)) countMax0++;
+            }
+            if(countMax0>1 && max >0){
+                lockedWorld.add(z);
+            }
+        }
+        
+    }
+    
+    public void greedyThem(HashSet<Drone> inuseDrones,HashSet lockedWorld){
        
         HashSet<Drone> droneDone=new HashSet(D);
         
-        for(RZoneDrone rzd : _buildRZoneDrone().setDistanceCalc().stream().filter((e)->e.z.owner==_nullPlayer ).sorted(comp_rzd_byDist.reversed()).collect(Collectors.toList())){
+        for(RZoneDrone rzd : _buildRZoneDrone().setDistanceCalc().stream().filter((e)->e.z.owner==_nullPlayer && !lockedWorld.contains(e.z) ).sorted(comp_rzd_byDist.reversed()).collect(Collectors.toList())){
            // System.err.println(""+rzd);
             
             if(rzd.d.owner==_me && !droneDone.contains(rzd.d)){//&& rzd.z.owner!=_me
@@ -440,7 +468,7 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
                     currAttaque.add(d);
 
                     //System.err.println("Considering " + rzd.d + " at " + z + " level " + rzd.level + " knowing " + currLevelCp + "/ Left " + nbDroneLeft + " used " + nbUsed);
-                    if (currLevelCp < currAttaque.size()) {
+                    if (currLevelCp < currAttaque.size() && currLevelCp<=DronePerPlanet) {
                         //System.err.println("Defense is breaking : attack drones "+currAttaque);
                         
                         //System.err.println("Attack "+z+" with "+currAttaque+" at "+z.cor);
@@ -493,12 +521,16 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
             }
         }
         rzdStruct.setDistanceCalc();
+        
+        HashSet lockedWorld=new HashSet();
         //System.err.println("generating orders "+_turnNumber);
         conquestTest();
         defendMonoworld();
         HashSet<Drone> inuseDrones = new HashSet<>();            
                   
-        greedyThem(inuseDrones);        
+        
+        detectLocked(lockedWorld);
+        greedyThem(inuseDrones,lockedWorld);        
         attackOpportunist(inuseDrones);        
         placementAttack(inuseDrones);
 
