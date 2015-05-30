@@ -110,19 +110,19 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
     }
 
     public class ThreatLevel {
-        
-        public static final int maxLevel=50;
 
-        private int[][] t = new int[P][maxLevel+1];
+        public static final int maxLevel = 50;
+
+        private int[][] t = new int[P][maxLevel + 1];
         int sp = 1;
-        
-        HashMap<PlayerAI,HashMap<Integer,List<Drone>>> droneAtLevel=new HashMap<>(P);
+
+        HashMap<PlayerAI, HashMap<Integer, List<Drone>>> droneAtLevel = new HashMap<>(P);
+
         {
-           for(PlayerAI p : _player){
-               droneAtLevel.put(p,new HashMap<>(maxLevel+1));              
-           }
-                
-            
+            for (PlayerAI p : _player) {
+                droneAtLevel.put(p, new HashMap<>(maxLevel + 1));
+            }
+
         }
 
         public ThreatLevel reset() {
@@ -134,7 +134,7 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         }
 
         private void increastLevelTo(int level) {
-            if (level >= maxLevel-1) {
+            if (level >= maxLevel - 1) {
                 return;
             }
             while (sp < level + 1) {
@@ -146,13 +146,12 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         }
 
         public void addThreat(Drone d, int level) {
-            if (level  >= maxLevel-1) {
+            if (level >= maxLevel - 1) {
                 return;
             }
             //System.err.println("Add threat " + d + " level " + level);
-            
-            
-            if(droneAtLevel.get(d.owner).get(level)==null){
+
+            if (droneAtLevel.get(d.owner).get(level) == null) {
                 droneAtLevel.get(d.owner).put(level, new ArrayList<>(D));
             }
             droneAtLevel.get(d.owner).get(level).add(d);
@@ -163,12 +162,16 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         }
 
         public int getThreatAt(PlayerAI p, int level) {
-            if (level  >= maxLevel-1) return t[p.id][maxLevel-1];
+            if (level >= maxLevel - 1) {
+                return t[p.id][maxLevel - 1];
+            }
             return t[p.id][level + 1];
         }
 
         public int getMaxThreatAt(int level, PlayerAI exclude) {
-            if (level  >= maxLevel-1) return getMaxThreatAt(maxLevel-1,exclude);
+            if (level >= maxLevel - 1) {
+                return getMaxThreatAt(maxLevel - 1, exclude);
+            }
 
             int max = -1;
             for (int i = 0; i < P; i++) {
@@ -209,7 +212,7 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
                 }
                 res += "\n";
             }
-            res+=""+droneAtLevel;
+            res += "" + droneAtLevel;
 
             return res;
         }
@@ -244,24 +247,70 @@ public class TestL1_DefenseV2 extends L1_botStruct.BotBase {
         HashSet<Drone> stuckDrone = new HashSet<>();
         HashSet<Drone> retreatDrone = new HashSet<>();
 
-        List<Drone> currLevelDr = new ArrayList<>();
-        int currLevelCp;
-
         for (Zone z : _zone) {
-            int[] maxThreat = threat.get(z).getMaxThreat(_me);
-            if (z.owner == _me) {
-                System.err.println("" + z +"\n"+ threat.get(z));
-                System.err.println("maxthreat[] " + arrayToString(maxThreat));
-
-                List<RZoneDrone> defDrones = rzdStruct.stream().filter(e -> e.d.owner == _me && e.z == z && zoneDefInfo.get(z).defDrone.contains(e.d))
-                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
-
-                currLevelCp = threat.get(z).getThreatAt(_me, 0);
-
-
-
+            if (z.owner != _me) {
+                continue;
             }
-        }
+
+            int[] maxThreat = threat.get(z).getMaxThreat(_me);
+
+            System.err.println("" + z + "\n" + threat.get(z));
+            System.err.println("maxthreat[] " + arrayToString(maxThreat));
+
+            List<RZoneDrone> defDrones = rzdStruct.stream().filter(e -> e.d.owner == _me && e.z == z && zoneDefInfo.get(z).defDrone.contains(e.d))
+                    .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
+            int nbDrone = zoneDefInfo.get(z).defDrone.size();
+            int nbDroneLeft = nbDrone;
+            for(RZoneDrone rzd : defDrones){
+                int nbUsed=nbDrone-nbDroneLeft;
+                Drone d =rzd.d;
+                int level=rzd.level;
+                int currLevelCp = maxThreat[level]; 
+                int nextLevelCp = maxThreat[level+1];
+                int futurLevelCp = maxThreat[level+2];
+                
+                
+                System.err.println("Considering "+rzd.d+" at "+z+" level "+rzd.level+" knowing "+currLevelCp+"/ Left "+nbDroneLeft+" used "+nbUsed);
+                if(currLevelCp> nbDrone ) System.err.println("Defense is breaking : release drones");
+                
+                if(currLevelCp<= nbUsed && nextLevelCp<=nbUsed && futurLevelCp<=nbUsed){
+                    System.err.println(""+d+" is considred free");
+                    freeDrone.add(d);
+                    nbDroneLeft--;                    
+                }else
+                if(currLevelCp<= nbUsed && nextLevelCp<=nbUsed){
+                    System.err.println(""+d+" is considred stuck");
+                    stuckDrone.add(d);
+                    nbDroneLeft--;
+                }else {
+                    System.err.println(""+d+" is considred retreat");
+                    retreatDrone.add(d);
+                    nbDroneLeft--;
+                } 
+            }
+            
+            for(Drone d : zoneDefInfo.get(z).defDrone){
+                if(freeDrone.contains(d)){
+                    _player.add(_nullPlayer);
+                    for (PlayerAI p : _player) {
+                        if (p == _me) {
+                            continue;
+                        }
+                        if (p.owned.size() > 0) {
+                                _order.put(d, p.owned.get(fixRa % p.owned.size()).cor);
+                                System.err.println("free Attacking "+ p.owned.get(fixRa%p.owned.size())+" fixed "+fixRa+"  size "+p.owned.size());
+                        }
+                    }
+                    _player.remove(_nullPlayer);                    
+                }else if(retreatDrone.contains(d)){
+                    _order.put(d, z.cor);
+                }else{
+                    _order.put(d,d.cor);
+                }
+            
+            }
+
+        }// fin zone
 
     }
 

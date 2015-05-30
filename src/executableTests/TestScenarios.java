@@ -75,7 +75,7 @@ public class TestScenarios {
        
         w.genWorld();
         
-        int nbturn=30;
+        int nbturn=100;
         int pas=0;
         
         Thread genIt=new Thread(){
