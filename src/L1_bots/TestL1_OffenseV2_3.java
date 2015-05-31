@@ -280,22 +280,10 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
 
     public void attackOpportunist(HashSet<Drone> inuseDrones) {
 
+        HashMap<Zone, ThreatLevel> threat = rzdStruct.getThreat(e->true);
+        
         for (PlayerAI p : _player) {
-            if(p==_me) continue;
-            
-            List<RZoneDrone> rzb = rzdStruct.stream().sorted(comp_rzd_byLevel.reversed().thenComparing(new CompByPlayerRzd(p.id).reversed())).collect(Collectors.toList());
-
-            HashMap<Zone, ThreatLevel> threat = new HashMap<>(Z);
-            for (Zone z : _zone) {
-                threat.put(z, new ThreatLevel().reset());
-            }
-
-            int cpThreat = 0;
-
-            for (RZoneDrone r : rzb) {
-                threat.get(r.z).addThreat(r.d, r.level);
-            }
-
+            if(p==_me) continue;            
             ///-------------- Classer les defenseurs en free / stuck / retreat
             HashSet<Drone> freeDrone = new HashSet<>();
             HashSet<Drone> stuckDrone = new HashSet<>();
@@ -341,28 +329,6 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                         break;
                     }
                 }
-
-//                for (Drone d : zoneDefInfo.get(z).defDrone) {
-//                    if (freeDrone.contains(d)) {
-//                        _player.add(_nullPlayer);
-//                        for (PlayerAI p : _player) {
-//                            if (p == _me) {
-//                                continue;
-//                            }
-//                            if (p.owned.size() > 0) {
-//                                _order.put(d, p.owned.get(fixRa % p.owned.size()).cor);
-//                                System.err.println("free Attacking " + p.owned.get(fixRa % p.owned.size()) + " fixed " + fixRa + "  size " + p.owned.size());
-//                            }
-//                        }
-//                        _player.remove(_nullPlayer);
-//                    } else if (retreatDrone.contains(d)) {
-//                        _order.put(d, z.cor);
-//                    } else {
-//                        _order.put(d, d.cor);
-//                    }
-//
-//                }
-
             }// fin zone            
 
         }
