@@ -14,6 +14,8 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Scanner;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -57,6 +59,116 @@ public class L1_botStruct {
     }
 
     public static class BotBase {
+        
+    public class ThreatLevel {
+
+        public static final int maxLevel = 70;
+
+        private int[][] t = new int[P][maxLevel + 1];
+        int sp = 1;
+
+        HashMap<PlayerAI, HashMap<Integer, List<Drone>>> droneAtLevel = new HashMap<>(P);
+
+        {
+            for (PlayerAI p : _player) {
+                droneAtLevel.put(p, new HashMap<>(maxLevel + 1));
+            }
+
+        }
+
+        public ThreatLevel reset() {
+            sp = 1;
+            for (int p = 0; p < P; p++) {
+                t[p][0] = 0;
+            }
+            return this;
+        }
+
+        private void increastLevelTo(int level) {
+            if (level >= maxLevel - 1) {
+                return;
+            }
+            while (sp < level + 1) {
+                for (int p = 0; p < P; p++) {
+                    t[p][sp] = t[p][sp - 1];
+                }
+                sp++;
+            }
+        }
+
+        public void addThreat(Drone d, int level) {
+            if (level >= maxLevel - 1) {
+                return;
+            }
+            //System.err.println("Add threat " + d + " level " + level);
+
+            if (droneAtLevel.get(d.owner).get(level) == null) {
+                droneAtLevel.get(d.owner).put(level, new ArrayList<>(D));
+            }
+            droneAtLevel.get(d.owner).get(level).add(d);
+
+            increastLevelTo(level + 1);
+            t[d.owner.id][level + 1]++;
+
+        }
+
+        public int getThreatAt(PlayerAI p, int level) {
+            if (level >= maxLevel - 1) {
+                return t[p.id][maxLevel - 1];
+            }
+            return t[p.id][level + 1];
+        }
+
+        public int getMaxThreatAt(int level, PlayerAI exclude) {
+            if (level >= maxLevel - 1) {
+                return getMaxThreatAt(maxLevel - 1, exclude);
+            }
+
+            int max = -1;
+            for (int i = 0; i < P; i++) {
+                if (i == exclude.id) {
+                    continue;
+                }
+                if (t[i][level + 1] > max) {
+                    max = t[i][level + 1];
+                }
+            }
+            return max;
+        }
+
+        public int[] getMaxThreat(PlayerAI exclude) {
+            int[] res = new int[sp - 1];
+            for (int i = 0; i < sp - 1; i++) {
+                res[i] = getMaxThreatAt(i, exclude);
+            }
+
+            return res;
+        }
+
+        @Override
+        public String toString() {
+            String res = "";
+
+            for (int i = 0; i < P; i++) {
+                for (int level = 0; level < sp; level++) {
+                    res += "|" + t[i][level];
+
+                }
+                res += "\n";
+            }
+            for (PlayerAI p : _player) {
+                res += "max for " + p + "\n";
+                for (int level = 0; level < sp - 1; level++) {
+                    res += "|" + (getMaxThreatAt(level, p)) + "";
+                }
+                res += "\n";
+            }
+            res += "" + droneAtLevel;
+
+            return res;
+        }
+
+    }        
 
         public static class CompByPlayerRzd implements Comparator<RZoneDrone> {
 
@@ -130,6 +242,27 @@ public class L1_botStruct {
 
             public Stream<RZoneDrone> stream() {
                 return s.stream();
+            }
+            
+            /**
+             * 
+             * @param predicate (permet d'enlever des drones ...)
+             * @return 
+             */
+            public HashMap<Zone,ThreatLevel> getThreat(Predicate<? super RZoneDrone> predicate){
+                List<RZoneDrone> rzb = s.stream().filter(predicate).sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
+                
+                HashMap<Zone, ThreatLevel> threat = new HashMap<>(Z);
+                int lastLevel=0;
+                for (RZoneDrone r : rzb) {
+                    if(!threat.containsKey(r.z)) threat.put(r.z, new ThreatLevel().reset());     
+                    if(r.level<lastLevel) throw new RuntimeException("Invariant broken "+r.level+" < "+lastLevel);
+                    threat.get(r.z).addThreat(r.d, r.level);
+                    lastLevel=r.level;
+                }                
+                
+                return threat;
+            
             }
 
         }
