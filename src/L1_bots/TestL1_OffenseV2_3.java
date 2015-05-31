@@ -110,7 +110,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
 
     public void defendMonoworld( HashSet<Drone> lockedDrones) {
 
-        HashMap<Zone, ThreatLevel> threat = rzdStruct.getThreat(e->!lockedDrones.contains(e.d));
+        HashMap<Zone, ThreatLevel> threat = rzdStruct.setDistanceCalc().getThreat(e->!lockedDrones.contains(e.d));
 
         ///-------------- Classer les defenseurs en free / stuck / retreat
         HashSet<Drone> freeDrone = new HashSet<>();
@@ -199,7 +199,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                             }
                             if (p.owned.size() > 0) {
                                 _order.get(d).set( targ.cor);
-                                System.err.println("def Attacking " + targ+"  "+them);
+                                //System.err.println("def Attacking " + targ+"  "+them);
                             }
                         }
                         _player.remove(_nullPlayer);        
@@ -266,7 +266,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
     }
     
     public void detectLocked(HashSet lockedWorld,HashSet<Drone> lockedDrones){
-       HashMap<Zone, ThreatLevel> threat =    rzdStruct.getThreat(e->true);
+       HashMap<Zone, ThreatLevel> threat =    rzdStruct.setDistanceCalc().getThreat(e->true);
         
         for(Zone z : _zone){
             int countMax0=0;
@@ -315,7 +315,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
 
     public void attackOpportunist(HashSet<Drone> inuseDrones,HashSet<Drone> lockedDrones) {
 
-        HashMap<Zone, ThreatLevel> threat = rzdStruct.getThreat(e->!lockedDrones.contains(e.d) && e.level!=0);
+        HashMap<Zone, ThreatLevel> threat = rzdStruct.setDistanceCalc().getThreat(e->true);
         
         for (PlayerAI p : _player) {
             if(p==_me) continue;            
