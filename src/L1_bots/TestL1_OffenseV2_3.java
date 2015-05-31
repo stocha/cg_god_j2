@@ -199,7 +199,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                             }
                             if (p.owned.size() > 0) {
                                 _order.get(d).set( targ.cor);
-                                //System.err.println("def Attacking " + targ+"  "+them);
+                                System.err.println("def Attacking " + targ+"  "+them);
                             }
                         }
                         _player.remove(_nullPlayer);        
@@ -223,7 +223,22 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
             targ=targProv;
             
             //System.err.println("Selected "+zz.get(0)+" targ (provi) is "+targ);
-        } else return;
+        } else {
+            zz=_buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());    
+
+            if(zz.size()>0){
+                Zone targProv;
+                targProv=zz.get(0).a;
+                if(targProv.owner==_me) targProv=zz.get(0).b;
+                targ=targProv;
+
+                //System.err.println("Selected "+zz.get(0)+" targ (provi) is "+targ);
+            } else {
+                return;
+
+            };            
+        
+        };
         
         zz=_buildRZoneZone().setDistance().stream().filter(
                 e->(((e.a==targ) || (e.b==targ)) &&((e.a.owner!=_me) && (e.b.owner!=_me)))
@@ -237,8 +252,16 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
         for(Drone d : attDrones){
             if(inuseDrones.contains(d)) continue;
             
-
-            _order.get(d).set(zz.get(0).coord);
+            if(d.dist(zz.get(0))<50){
+                int toss=rand.nextInt()&0x01;
+                
+                if(toss==0)
+                    _order.get(d).set(zz.get(0).a);
+                else{
+                    _order.get(d).set(zz.get(0).b);
+                }
+            }else
+                _order.get(d).set(zz.get(0).coord);
         }
     }
     
@@ -264,7 +287,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                     if(r.d.owner==_me) continue;                       
                     int level=r.level;
                     if(level==0){
-                        System.err.println("Adding "+r.d+" to ignored locks");
+                        //System.err.println("Adding "+r.d+" to ignored locks");
                         lockedDrones.add(r.d);
                     }
                 }                
