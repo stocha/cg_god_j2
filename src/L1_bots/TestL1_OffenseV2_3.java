@@ -108,7 +108,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
         return r;
     }
 
-    public void defendMonoworld() {
+    public void defendMonoworld( HashSet<Drone> lockDrone) {
 
         HashMap<Zone, ThreatLevel> threat = rzdStruct.getThreat(e->true);
 
@@ -177,11 +177,11 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
 
         }// fin zone
         
-        attackWithDef(freeDefender);
+        attackWithDef(freeDefender,lockDrone);
 
     }
     
-    public void attackWithDef(List<Drone> them ){
+    public void attackWithDef(List<Drone> them ,HashSet<Drone> lockDrone){
         
         List<RZoneZone> zz=_buildRZoneZone().setDistance().stream().filter(
                 e->((e.a.owner==_me) || (e.b.owner==_me))&&((e.a.owner!=_me) || (e.b.owner!=_me))
@@ -242,7 +242,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
         }
     }
     
-    public void detectLocked(HashSet lockedWorld){
+    public void detectLocked(HashSet lockedWorld,HashSet<Drone> lockedDrones){
        HashMap<Zone, ThreatLevel> threat =    rzdStruct.getThreat(e->true);
         
         for(Zone z : _zone){
@@ -257,6 +257,18 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                 lockedWorld.add(z);
             }
         }
+        
+        List<RZoneDrone> rzb = rzdStruct.stream().filter(e->lockedWorld.contains(e.z)).sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
+                
+                for (RZoneDrone r : rzb) {
+                    if(r.d.owner==_me) continue;                       
+                    int level=r.level;
+                    if(level==0){
+                        System.err.println("Adding "+r.d+" to ignored locks");
+                        lockedDrones.add(r.d);
+                    }
+                }                
+                
         
     }
     
@@ -348,14 +360,15 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
         }
         rzdStruct.setDistanceCalc();
         
-        HashSet lockedWorld=new HashSet();
+        HashSet<Zone> lockedWorld=new HashSet<>();
+        HashSet<Drone> lockedDrones=new HashSet<>();
         //System.err.println("generating orders "+_turnNumber);
         conquestTest();
-        defendMonoworld();
+        defendMonoworld(lockedDrones);
         HashSet<Drone> inuseDrones = new HashSet<>();            
                   
         
-        detectLocked(lockedWorld);
+        detectLocked(lockedWorld,lockedDrones);
         greedyThem(inuseDrones,lockedWorld);        
         attackOpportunist(inuseDrones);        
         placementAttack(inuseDrones);

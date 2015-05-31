@@ -73,10 +73,10 @@ public class TestScenarios {
    public static void testV2Off(){
  
         //WorldBase w=new WorldBase(11, 8, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_OffenseV2_2.fact));
-        //WorldBase w=new WorldBase(11, 8, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_OffenseV2_3.fact));        
+        WorldBase w=new WorldBase(11, 8, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_OffenseV2_3.fact));        
 
        //WorldBase w=new WorldBase(7, 6, 9937777, new TesterBot(TestL1_OffenseV2_2.fact), new TesterBot(TestL1_OffenseV2.fact));//,new TesterBot(Test1_SimpleV2.fact));
-       WorldBase w=new WorldBase(7, 6, 9937777, new TesterBot(TestL1_OffenseV2_3.fact), new TesterBot(TestL1_OffenseV2.fact));//,new TesterBot(Test1_SimpleV2.fact));
+       //WorldBase w=new WorldBase(7, 6, 9937777, new TesterBot(TestL1_OffenseV2_3.fact), new TesterBot(TestL1_OffenseV2.fact));//,new TesterBot(Test1_SimpleV2.fact));
        
         w.genWorld();
         

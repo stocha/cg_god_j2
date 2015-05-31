@@ -4,9 +4,9 @@
  * and open the template in the editor.
 
 V2_3 objectifs :
-- Contrer le joueur gagnant ( score syscontrol 2 / 3+)
-- Ignorer les drones en lock
-- Barycentre gambling
+- Contrer le joueur gagnant ( score syscontrol 2 / 3+   ---  ?)
+- Ignorer les drones en lock (facile)
+- Barycentre gambling (facile -> si tous arrive, alors gambling)
 - (Current bug) Choix des cibles : Closest worlds ? Indefended worlds ? (2 joueurs ?)
 
 > meilleure utilisation des defenseurs / reatribution des defenseurs
