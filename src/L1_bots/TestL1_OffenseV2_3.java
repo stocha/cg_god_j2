@@ -215,7 +215,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                     }
                     if (p.owned.size() > 0) {
                         
-                        if(d.dist(droneDefInfo.get(d))>0.5*droneDefInfo.get(d).dist(targ.cor)){
+                        if( droneDefInfo.containsKey(d) && d.dist(droneDefInfo.get(d))>0.5*droneDefInfo.get(d).dist(targ.cor)){
                             releaseDefender(droneDefInfo.get(d), d);
                         }else
                             _order.get(d).set(targ.cor);                        

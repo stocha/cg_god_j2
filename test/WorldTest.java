@@ -71,7 +71,6 @@ public class WorldTest {
             if(maxT <t) maxT=t;
             System.err.println("------------------------------");
             System.err.println("temps mili " + t+" maxT "+maxT);
-            System.gc();
         }
 
     }        

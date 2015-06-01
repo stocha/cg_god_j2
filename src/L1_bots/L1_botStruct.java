@@ -600,6 +600,7 @@ public class L1_botStruct {
         @Override
         public void turn(int[] zline, List<List<L0_2dLib.Point>> droneLinesPerPlayer) {
             long t0 = System.currentTimeMillis();
+            System.gc();
 
             bot.inputTurnZonesOwner(zline);
 
@@ -608,8 +609,6 @@ public class L1_botStruct {
             }
 
             long t1 = System.currentTimeMillis();
-
-            System.gc();
             long t = t1 - t0;
             System.err.println("" + t + " ms");
         }
