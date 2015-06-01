@@ -22,6 +22,9 @@ V2_3 objectifs :
  Quand un defenseur depasse la moitie de la distance, il doit tenter de squatter / participer a une attaque.
 (au pire on est quand meme positif)
 
+--> Quand def > 1/2 d nearest, alors il est relaché.
+--> Quand un dr ennemi a 90% de vitesse max vers un monde, alors il est a destination de ce monde a T = d/100.
+
 
  */
 

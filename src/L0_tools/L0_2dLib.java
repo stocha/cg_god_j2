@@ -5,7 +5,7 @@
  */
 package L0_tools;
 
-import java.awt.Point;
+import java.util.List;
 
 /**
  *
@@ -87,9 +87,27 @@ public class L0_2dLib {
         
         public void setAsBarycentre(WithCoord a, double ad, WithCoord b, double bd){
             double sum=ad+bd;
-            x=ad*a.x() / sum+bd*b.x()/sum;
-            y=ad*a.y() /sum +bd*b.y() /sum;
-        }
+            double dx=ad*a.x() / sum+bd*b.x()/sum;
+            double dy=ad*a.y() /sum +bd*b.y() /sum;
+            
+            this.set(dx,dy);
+        }        
     }
+    
+        public static Point baryCentre(List<? extends WithCoord> l){
+            Point res=new Point();
+            if(l.size()==0) return res;
+            if(l.size()==1){res.set(l.get(0));return res;}
+            
+            double p=2;
+            res.setAsBarycentre(l.get(0),1, l.get(1),1);
+            for(int i=2;i<l.size();i++){
+                res.setAsBarycentre(res,i, l.get(i),1);
+            
+            }
+            
+            
+            return res;
+        }    
     
 }
