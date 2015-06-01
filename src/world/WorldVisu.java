@@ -149,9 +149,15 @@ public class WorldVisu {
                     int y = (int) (w.turn.get(currTurn).playerDrones.get(p).get(d).y * scale);
                     int cp = '0' + (char) p;
                     int cd = 'a' + (char) d;
+                    
+                    int dx = (int) (w.turn.get(currTurn).playerDronesOrders.get(p).get(d).x * scale);
+                    int dy = (int) (w.turn.get(currTurn).playerDronesOrders.get(p).get(d).y * scale);                    
 
                     g.fillOval(ox + x - droneRadius, oy + y - droneRadius, droneRadius * 2, droneRadius * 2);
                     g.drawString("" + (char) cp + (char) cd, ox + x - droneRadius, oy + y - droneRadius);
+                    g.drawLine(x, y, dx, dy);
+                    
+                    
 
                     //im[x][y] = "" + (char) cp + (char) cd;
                 }

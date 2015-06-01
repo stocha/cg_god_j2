@@ -296,6 +296,7 @@ public static class BotSwarm implements WorldBot {
                 Point old = prev.playerDrones.get(p).get(d);
                 Point dst = orders.get(d);
                 Point n = new Point();
+                prev.playerDronesOrders.get(p).get(d).set(dst);
 
                 if (old.dist(dst) <= world_speed) {
                     n.set(dst);
