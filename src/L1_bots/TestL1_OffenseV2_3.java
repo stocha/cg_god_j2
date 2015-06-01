@@ -40,6 +40,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
     }
 
     HashMap<Zone, ZoneDef> zoneDefInfo = new HashMap<>(Z);
+    HashMap<Drone, Zone> droneDefInfo = new HashMap<>(D);
 
     HashMap<Zone, Boolean> ownedPrev = new HashMap<>(Z);
 
@@ -60,11 +61,17 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
 
         rzdStruct = _buildRZoneDrone();
     }
+    
+    private void releaseDefender(Zone z,Drone d){
+        if(!zoneDefInfo.get(z).defDrone.contains(d)) throw new RuntimeException("Not in defenseur");
+        droneDefInfo.remove(d);
+        zoneDefInfo.get(z).defDrone.remove(d);
+        attDrones.add(d);
+    }
 
     public void conquestTest() {
         //System.err.println("owned prev "+ownedPrev);
         for (Zone z : _zone) {
-
             if (ownedPrev.get(z) != (z.owner == _me)) {
                 if (z.owner == _me) {
                     //conquest
@@ -76,6 +83,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                             .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList())) {
 
                         zoneDefInfo.get(z).defDrone.add(rzd.d);
+                        droneDefInfo.put(rzd.d,z);
                         defd--;
                         if (defd == 0) {
                             break;
@@ -87,6 +95,9 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                     // lost
                     System.err.println("Lost " + z);
                     attDrones.addAll(zoneDefInfo.get(z).defDrone);
+                    for(Drone d : zoneDefInfo.get(z).defDrone){
+                        droneDefInfo.remove(d);
+                    }
                     zoneDefInfo.get(z).defDrone.clear();
                     System.err.println("Att drones " + attDrones);
 
@@ -95,6 +106,10 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
             }
             ownedPrev.put(z, z.owner == _me);
         }
+        
+//        List<RZoneDrone> defDrones = rzdStruct.stream().filter(e -> zoneDefInfo.get( e.z).defDrone.contains(e.d))
+//                    .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());        
+//        
 
     }
 
@@ -199,7 +214,11 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                         continue;
                     }
                     if (p.owned.size() > 0) {
-                        _order.get(d).set(targ.cor);
+                        
+                        if(d.dist(droneDefInfo.get(d))>0.5*droneDefInfo.get(d).dist(targ.cor)){
+                            releaseDefender(droneDefInfo.get(d), d);
+                        }else
+                            _order.get(d).set(targ.cor);                        
                         //System.err.println("def Attacking " + targ+"  "+them);
                     }
                 }
