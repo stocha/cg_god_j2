@@ -232,6 +232,12 @@ public class TestL1_OffenseV2_4 extends L1_botStruct.BotBase {
 
     }
 
+    public void outputText(String t) {
+        if(true) return;
+        
+        System.err.println("" + this.getClass().getSimpleName() + " " + t);
+    }
+
     public void placementAttack(HashSet<Drone> inuseDrones) {
         HashSet<Drone> droneDone = new HashSet(D);
 
@@ -317,7 +323,61 @@ public class TestL1_OffenseV2_4 extends L1_botStruct.BotBase {
                 rzzl, (RZoneZone u1, RZoneZone u2) -> sumDefense.get(u1) - sumDefense.get(u2)
         );
 
+        List<RZoneDrone> attZoneDrones = rzdStruct.stream()
+                .filter(e -> e.d.owner == _me && e.z.owner != _me && attDrones.contains(e.d) && !inuseDrones.contains(e.d))
+                .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
+
+        List<Drone> sent = new ArrayList<>(D);
         for (RZoneZone rzz : rzzl) {
+            sent.clear();
+            int distLevelMax = 0;
+            int nbDroneNecc = (sumDefense.get(rzz) / 2) + 1;
+            for (RZoneDrone rzd : attZoneDrones) {
+                if (inuseDrones.contains(rzd.d)) {
+                    continue;
+                }
+                if (rzd.z != rzz.a && rzd.z != rzz.b) {
+                    continue;
+                }
+
+                if (sent.size() < nbDroneNecc) {
+                    double dis = rzd.d.dist(rzz);
+                    if (((int) (dis - 1 / 100)) > distLevelMax) {
+                        distLevelMax = ((int) (dis - 1 / 100));
+                    }
+                    sent.add(rzd.d);
+                }
+            }
+            
+            if(sent.size()==0) continue;
+
+            if (distLevelMax == 0) {
+                outputText("ALL BOT READY " + sent+" for "+rzz);
+                final Zone targ;
+                int toss=(rand.nextInt()>>1)&0x1;
+                if(toss==0) targ=rzz.a; else targ=rzz.b;
+                outputText("Pushing attack to "+" "+targ);
+                
+                for (Drone d : sent) {
+                    inuseDrones.add(d);
+                    _order.get(d).set(targ);
+
+
+                }                
+            } else {
+                for (Drone d : sent) {
+                    inuseDrones.add(d);
+                    int dlevl = (int) (d.dist(rzz) - 1 / 100);
+                    if (dlevl == distLevelMax) {
+                        outputText("MOVING TO ATTACK _2 " + d+" "+rzz);
+                        _order.get(d).set(rzz);
+                    } else {
+                        outputText("WAITING TO ATTACK _2 " + d+" "+rzz);
+                    }
+
+                }
+            }
+
             // System.err.println(""+rzz+" defsum "+sumDefense.get(rzz));
         }
 
@@ -367,7 +427,7 @@ public class TestL1_OffenseV2_4 extends L1_botStruct.BotBase {
                     if (currLevelCp < currAttaque.size() && currLevelCp <= DronePerPlanet) {
                         //System.err.println("Defense is breaking : attack drones "+currAttaque);
 
-                        System.err.println("" + this.getClass().getSimpleName() + " " + "Attack " + z + " with " + currAttaque + " at " + z.cor);
+                        //System.err.println("" + this.getClass().getSimpleName() + " " + "Attack " + z + " with " + currAttaque + " at " + z.cor);
                         for (Drone atd : currAttaque) {
                             _order.get(atd).set(z.cor);
                             inuseDrones.add(atd);
