@@ -155,7 +155,7 @@ public class WorldVisu {
 
                     g.fillOval(ox + x - droneRadius, oy + y - droneRadius, droneRadius * 2, droneRadius * 2);
                     g.drawString("" + (char) cp + (char) cd, ox + x - droneRadius, oy + y - droneRadius);
-                    g.drawLine(x, y, dx, dy);
+                    g.drawLine(ox +x, oy +y, ox+dx, oy +dy);
                     
                     
 

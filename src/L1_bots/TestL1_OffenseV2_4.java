@@ -8,6 +8,7 @@ package L1_bots;
 
 import L0_tools.L0_2dLib;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -80,7 +81,7 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
 
                     int defd = DronePerPlanet;
                     for (RZoneDrone rzd : rzdStruct.stream()
-                            .filter(e -> e.d.owner == _me && attDrones.contains(e.d) && e.z == z)
+                            .filter(e -> e.d.owner == _me && attDrones.contains(e.d) && e.z == z && e.level < 3)
                             .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList())) {
 
                         zoneDefInfo.get(z).defDrone.add(rzd.d);
@@ -230,65 +231,18 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
     }
 
     public void placementAttack(HashSet<Drone> inuseDrones) {
+        HashSet<Drone> droneDone = new HashSet(D);
+        
+        if(_me.owned.size()>0) return;
 
-        //System.err.println("Placement "+attDrones+"  inuse :  "+inuseDrones);
-        List<RZoneZone> zz = _buildRZoneZone().setDistance().stream().filter(
-                e -> ((e.a.owner == _me) || (e.b.owner == _me)) && ((e.a.owner != _me) || (e.b.owner != _me))
-        ).sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
-        final Zone targ;
-        if (zz.size() > 0) {
-            Zone targProv;
-            targProv = zz.get(0).a;
-            if (targProv.owner == _me) {
-                targProv = zz.get(0).b;
-            }
-            targ = targProv;
+        L0_2dLib.Point bary = L0_2dLib.baryCentre(_drone.get(_me));
+        for (Drone d : _drone.get(_me)) {
 
-            //System.err.println("Selected "+zz.get(0)+" targ (provi) is "+targ);
-        } else {
-            zz = _buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
-
-            if (zz.size() > 0) {
-                Zone targProv;
-                targProv = zz.get(0).a;
-                if (targProv.owner == _me) {
-                    targProv = zz.get(0).b;
-                }
-                targ = targProv;
-
-                //System.err.println("Selected "+zz.get(0)+" targ (provi) is "+targ);
-            } else {
-                return;
-
-            };
-
-        };
-
-        zz = _buildRZoneZone().setDistance().stream().filter(
-                e -> (((e.a == targ) || (e.b == targ)) && ((e.a.owner != _me) && (e.b.owner != _me)))
-        ).sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
-
-        if (zz.size() > 0) {
-        } else {
-            return;
-        }
-
-        //System.err.println("Sending to "+zz.get(0));
-        for (Drone d : attDrones) {
-            if (inuseDrones.contains(d)) {
-                continue;
-            }
-
-            if (d.dist(zz.get(0)) < 50) {
-                int toss = rand.nextInt() & 0x01;
-
-                if (toss == 0) {
-                    _order.get(d).set(zz.get(0).a);
-                } else {
-                    _order.get(d).set(zz.get(0).b);
-                }
-            } else {
-                _order.get(d).set(zz.get(0).coord);
+            if (d.owner == _me && !droneDone.contains(d) && !inuseDrones.contains(d)) {//&& rzd.z.owner!=_me
+                _order.get(d).set(bary);
+                //System.err.println(""+rzd.d+" is heading to "+rzd.z);
+                droneDone.add(d);
+                inuseDrones.add(d);
             }
         }
     }
@@ -328,33 +282,42 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
 
     }
 
-    public void greedyThem(HashSet<Drone> inuseDrones, HashSet lockedWorld) {
-
-        HashSet<Drone> droneDone = new HashSet(D);
+    
+    public void opportunistAnalysisSecond(HashSet<Drone> inuseDrones, HashSet<Drone> lockedDrones){
+        HashMap<Zone, List<Drone>> defenders=new HashMap<>();                
+        List<RZoneDrone> defDrones = rzdStruct.stream()
+                .filter(e -> e.d.owner == e.z.owner && !inuseDrones.contains(e.d))
+                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());   
         
-        if(_me.owned.size()>0) return;
-
-        L0_2dLib.Point bary = L0_2dLib.baryCentre(_drone.get(_me));
-        for (Drone d : _drone.get(_me)) {
-
-            if (d.owner == _me && !droneDone.contains(d) && !inuseDrones.contains(d)) {//&& rzd.z.owner!=_me
-                _order.get(d).set(bary);
-                //System.err.println(""+rzd.d+" is heading to "+rzd.z);
-                droneDone.add(d);
-                inuseDrones.add(d);
-            }
+        for(Zone z : _zone){
+            defenders.put(z,new ArrayList<>(D));
         }
-
-//        for(RZoneDrone rzd : _buildRZoneDrone().setDistanceCalc().stream().filter((e)->e.z.owner==_nullPlayer && !lockedWorld.contains(e.z) ).sorted(comp_rzd_byDist.reversed()).collect(Collectors.toList())){
-//           // System.err.println(""+rzd);
-//            
-//            if(rzd.d.owner==_me && !droneDone.contains(rzd.d)){//&& rzd.z.owner!=_me
-//                _order.get(rzd.d).set(rzd.z);
-//                //System.err.println(""+rzd.d+" is heading to "+rzd.z);
-//                droneDone.add(rzd.d);
-//                inuseDrones.add(rzd.d);
-//            }        
-//        }
+        
+        HashSet<Drone> hs = new HashSet<>();
+        for(RZoneDrone e : defDrones){
+            if(hs.contains(e.d)) continue;
+            hs.add(e.d);
+            defenders.get(e.z).add(e.d);
+            
+        }
+        //--------- Defenders assigned --------------
+        
+        HashMap<RZoneZone,Integer> sumDefense=new HashMap<RZoneZone, Integer>(Z*Z);
+        List<RZoneZone> rzzl=_buildRZoneZone().s.stream().filter(e->e.a.owner ==e.b.owner && e.b.owner!=_me).collect(Collectors.toList());
+        for(RZoneZone rzz : rzzl){
+            int v=defenders.get(rzz.a).size()+defenders.get(rzz.b).size();
+            sumDefense.put(rzz, v);
+        }
+        Collections.sort(
+                rzzl, (RZoneZone u1, RZoneZone u2) -> sumDefense.get(u1)-sumDefense.get(u2) 
+                )
+        ;
+        
+        for(RZoneZone rzz : rzzl){
+           System.err.println(""+rzz+" defsum "+sumDefense.get(rzz));
+        }        
+                
+    
     }
 
     public void attackOpportunist(HashSet<Drone> inuseDrones, HashSet<Drone> lockedDrones) {
@@ -414,7 +377,6 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
             }// fin zone            
 
         }
-
     }
 
     @Override
@@ -439,8 +401,8 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
         defendMonoworld(lockedDrones);
         HashSet<Drone> inuseDrones = new HashSet<>();
 
-        attackOpportunist(inuseDrones, lockedDrones);        
-        greedyThem(inuseDrones, lockedWorld);
+        attackOpportunist(inuseDrones, lockedDrones);   
+        opportunistAnalysisSecond(inuseDrones, lockedDrones);
         placementAttack(inuseDrones);
 
         //debug_attackplan();
