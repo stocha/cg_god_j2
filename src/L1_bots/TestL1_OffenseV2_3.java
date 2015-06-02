@@ -75,7 +75,7 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
             if (ownedPrev.get(z) != (z.owner == _me)) {
                 if (z.owner == _me) {
                     //conquest
-                    System.err.println("Conquest " + z);
+                    //System.err.println("Conquest " + z);
 
                     int defd = DronePerPlanet;
                     for (RZoneDrone rzd : rzdStruct.stream()
@@ -93,13 +93,13 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
 
                 } else {
                     // lost
-                    System.err.println("Lost " + z);
+                    //System.err.println("Lost " + z);
                     attDrones.addAll(zoneDefInfo.get(z).defDrone);
                     for(Drone d : zoneDefInfo.get(z).defDrone){
                         droneDefInfo.remove(d);
                     }
                     zoneDefInfo.get(z).defDrone.clear();
-                    System.err.println("Att drones " + attDrones);
+                    //System.err.println("Att drones " + attDrones);
 
                 }
 
@@ -163,15 +163,15 @@ public class TestL1_OffenseV2_3 extends L1_botStruct.BotBase {
                 }
 
                 if (currLevelCp <= nbUsed && nextLevelCp <= nbUsed && futurLevelCp <= nbUsed) {
-                    System.err.println("" + d + " is considred free");
+                    //System.err.println("" + d + " is considred free");
                     freeDrone.add(d);
                     nbDroneLeft--;
                 } else if (currLevelCp <= nbUsed && nextLevelCp <= nbUsed) {
-                    System.err.println("" + d + " is considred stuck");
+                    //System.err.println("" + d + " is considred stuck");
                     stuckDrone.add(d);
                     nbDroneLeft--;
                 } else {
-                    System.err.println("" + d + " is considred retreat");
+                    //System.err.println("" + d + " is considred retreat");
                     retreatDrone.add(d);
                     nbDroneLeft--;
                 }
