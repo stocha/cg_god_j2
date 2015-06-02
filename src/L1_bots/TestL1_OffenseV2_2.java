@@ -86,10 +86,10 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
 
                 } else {
                     // lost
-                    System.err.println("Lost "+z);
+                    //System.err.println("Lost "+z);
                     attDrones.addAll(zoneDefInfo.get(z).defDrone);
                     zoneDefInfo.get(z).defDrone.clear();
-                    System.err.println("Att drones "+attDrones);
+                    //System.err.println("Att drones "+attDrones);
 
                 }
 
