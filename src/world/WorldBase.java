@@ -220,6 +220,15 @@ public static class BotSwarm implements WorldBot {
     final List<Point> zones;
     final List<Turn> turn;
     final Random rand;
+    boolean fullRand=false;
+    
+     public WorldBase(int D, int Z, long seed, boolean fullRand, WorldBot... bots){
+         this(D,Z,seed,bots);
+         this.fullRand=fullRand;
+         
+         
+     }
+             
 
     public WorldBase(int D, int Z, long seed, WorldBot... bots) {
         this.D = D;
@@ -253,18 +262,33 @@ public static class BotSwarm implements WorldBot {
             zz.y += dec / 2;
         }
 
-        for (Point d : turn.get(turn.size() - 1).playerDrones.get(0)) {
-            d.set(((rand.nextInt() & 0xFFFF) % (int) (world_width - dec)), ((rand.nextInt() & 0xFFFF) % (int) (world_height - dec)));
-            d.x += dec / 2;
-            d.y += dec / 2;
-        }
-        for (int p = 1; p < P; p++) {
-            for (int d = 0; d < D; d++) {
-                turn.get(turn.size() - 1).playerDrones.get(p).get(d).set(
-                        turn.get(turn.size() - 1).playerDrones.get(0).get(d)
-                );
+        if(!fullRand)
+            for (Point d : turn.get(turn.size() - 1).playerDrones.get(0)) {
+                d.set(((rand.nextInt() & 0xFFFF) % (int) (world_width - dec)), ((rand.nextInt() & 0xFFFF) % (int) (world_height - dec)));
+                d.x += dec / 2;
+                d.y += dec / 2;
             }
-        }        
+        else{
+            for (int p = 0; p < P; p++) {
+                for (Point d : turn.get(turn.size() - 1).playerDrones.get(p)) {
+                    d.set(((rand.nextInt() & 0xFFFF) % (int) (world_width - dec)), ((rand.nextInt() & 0xFFFF) % (int) (world_height - dec)));
+                    d.x += dec / 2;
+                    d.y += dec / 2;
+                }
+            }           
+        
+        
+        }
+        
+        
+        if(!fullRand)
+            for (int p = 1; p < P; p++) {
+                for (int d = 0; d < D; d++) {
+                    turn.get(turn.size() - 1).playerDrones.get(p).get(d).set(
+                            turn.get(turn.size() - 1).playerDrones.get(0).get(d)
+                    );
+                }
+            }        
 
         int i = 0;
         for (WorldBot b : bots) {
