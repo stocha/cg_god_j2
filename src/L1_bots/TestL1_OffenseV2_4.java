@@ -92,16 +92,18 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
                         }
                     }
                     attDrones.removeAll(zoneDefInfo.get(z).defDrone);
+                    
+                    System.err.println("Conquest def "+z+" " + zoneDefInfo.get(z).defDrone+" att "+attDrones);
 
                 } else {
                     // lost
-                  //  System.err.println("Lost " + z);
+                    System.err.println("Lost " + z+" "+zoneDefInfo.get(z).defDrone);
                     attDrones.addAll(zoneDefInfo.get(z).defDrone);
                     for(Drone d : zoneDefInfo.get(z).defDrone){
                         droneDefInfo.remove(d);
                     }
                     zoneDefInfo.get(z).defDrone.clear();
-                  //  System.err.println("Att drones " + attDrones);
+                    System.err.println("Att drones " + attDrones);
 
                 }
 
@@ -303,7 +305,7 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
         //--------- Defenders assigned --------------
         
         HashMap<RZoneZone,Integer> sumDefense=new HashMap<RZoneZone, Integer>(Z*Z);
-        List<RZoneZone> rzzl=_buildRZoneZone().s.stream().filter(e->e.a.owner ==e.b.owner && e.b.owner!=_me).collect(Collectors.toList());
+        List<RZoneZone> rzzl=_buildRZoneZone().setDistance().s.stream().filter(e->e.a.owner ==e.b.owner && e.b.owner!=_me).sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
         for(RZoneZone rzz : rzzl){
             int v=defenders.get(rzz.a).size()+defenders.get(rzz.b).size();
             sumDefense.put(rzz, v);
@@ -314,7 +316,7 @@ public class TestL1_OffenseV2_4  extends L1_botStruct.BotBase {
         ;
         
         for(RZoneZone rzz : rzzl){
-           System.err.println(""+rzz+" defsum "+sumDefense.get(rzz));
+          // System.err.println(""+rzz+" defsum "+sumDefense.get(rzz));
         }        
                 
     

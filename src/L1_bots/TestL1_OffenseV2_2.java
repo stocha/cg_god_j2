@@ -69,7 +69,7 @@ public class TestL1_OffenseV2_2 extends L1_botStruct.BotBase {
             if (ownedPrev.get(z) != (z.owner == _me)) {
                 if (z.owner == _me) {
                     //conquest
-                     System.err.println("Conquest "+z);
+                    // System.err.println("Conquest "+z);
 
                     int defd = DronePerPlanet;
                     for (RZoneDrone rzd : rzdStruct.stream()
