@@ -92,6 +92,31 @@ public class L0_2dLib {
             
             this.set(dx,dy);
         }        
+        
+        public double scal(Point a){
+            double res;
+            res=x*a.x+y*a.y;
+            return res;
+        }        
+        
+        Point vectTo(Point dest){
+            Point res=new Point();
+            res.x=dest.x-this.x;
+            res.y=dest.y-this.y;
+            
+            return res;
+        }
+        
+        public double speedTowardAtSpeed(Point cible, Point vit){
+            //System.err.println("B "+cible+" A "+this+" speed "+vit);
+            
+            double res=vit.scal(vectTo(cible));
+            double dist=this.dist(cible);
+            if(dist==0) return 0;
+            
+            res=res/dist; // vitesse corigee                        
+            return res;
+        }        
     }
     
         public static Point baryCentre(List<? extends WithCoord> l){
@@ -109,5 +134,7 @@ public class L0_2dLib {
             
             return res;
         }    
+        
+
     
 }

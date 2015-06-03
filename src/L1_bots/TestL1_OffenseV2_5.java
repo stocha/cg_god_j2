@@ -161,6 +161,7 @@ public class TestL1_OffenseV2_5 extends L1_botStruct.BotBase {
                 int nextLevelCp = maxThreat[level + 1];
                 int futurLevelCp = maxThreat[level + 2];
 
+                outputText(""+rzd.toString()+" "+rzd.headingPercent);
                 //System.err.println("Considering " + rzd.d + " at " + z + " level " + rzd.level + " knowing " + currLevelCp + "/ Left " + nbDroneLeft + " used " + nbUsed);
                 if (currLevelCp > nbDrone) {
                     //System.err.println("Defense is breaking : release drones");
@@ -585,9 +586,14 @@ public class TestL1_OffenseV2_5 extends L1_botStruct.BotBase {
             }
         });
 
-        System.err.println("" + this.getClass().getSimpleName() + " inuse " + inuseDrones);
-        System.err.println("" + this.getClass().getSimpleName() + " AllDefDrones " + collectDefDrones);
-        System.err.println("" + this.getClass().getSimpleName() + " AllAttack " + attDrones);
+        //System.err.println("" + this.getClass().getSimpleName() + " inuse " + inuseDrones);
+        //System.err.println("" + this.getClass().getSimpleName() + " AllDefDrones " + collectDefDrones);
+        //System.err.println("" + this.getClass().getSimpleName() + " AllAttack " + attDrones);
+        
+        for(Drone d : _drone.get(_me)){
+            //outputText(""+d+" "+d.speed_1+" "+d.speed_2);
+        
+        }
     }
 
     public int getMaxInt(int t[], int exclude) {
@@ -626,16 +632,16 @@ public class TestL1_OffenseV2_5 extends L1_botStruct.BotBase {
         int[] sc=new int[P];
         for(PlayerAI p : _player){
             sc[p.id]=p.score;
-            outputText("p.id <-"+p.score);
+            //outputText("p.id <-"+p.score);
         }
         
         HashSet<Drone> inuseDrones = new HashSet<>();        
 
-        if ((_me.owned.size() <= 1) || ((_me.owned.size() <= 2) && (_me.score < getMaxInt(sc, _me.id)))) {
-            outputText("Defend mono max score is "+getMaxInt(sc, _me.id)+" nbControlled is "+_me.owned.size());
+        if ((_me.owned.size() <= 1) || ((_me.owned.size() <= 2) && (_me.score < getMaxInt(sc, _me.id) +50))) {
+            //outputText("Defend mono max score is "+getMaxInt(sc, _me.id)+" nbControlled is "+_me.owned.size());
             defendMonoworld(lockedDrones);
         } else {
-            outputText("Defend ALL max score is "+getMaxInt(sc, _me.id)+" nbControlled is "+_me.owned.size());
+            //outputText("Defend ALL max score is "+getMaxInt(sc, _me.id)+" nbControlled is "+_me.owned.size());
             full_defenseUrgent( inuseDrones,lockedDrones);
         }
 
@@ -644,7 +650,7 @@ public class TestL1_OffenseV2_5 extends L1_botStruct.BotBase {
         opportunistAnalysisSecond(inuseDrones, lockedDrones);
         placementAttack(inuseDrones);
 
-        //verifInvariants(inuseDrones, lockedDrones);
+        verifInvariants(inuseDrones, lockedDrones);
         //debug_attackplan();
         return super.outorders(); //To change body of generated methods, choose Tools | Templates.
     }

@@ -203,6 +203,7 @@ public class L1_botStruct {
             final Drone d;
             double dist;
             int level;
+            double headingPercent;
 
             public RZoneDrone(Zone z, Drone d) {
                 this.z = z;
@@ -236,6 +237,7 @@ public class L1_botStruct {
                 for (RZoneDrone r : s) {
                     r.dist = r.z.dist(r.d);
                     r.level = (int) (r.dist - 1) / 100;
+                    r.headingPercent=Math.max(r.d.cor.speedTowardAtSpeed(r.z.cor, r.d.speed_1), r.d.cor.speedTowardAtSpeed(r.z.cor, r.d.speed_2));
                 }
                 return this;
             }
@@ -429,11 +431,20 @@ public class L1_botStruct {
             final PlayerAI owner;
 
             final L0_2dLib.Point cor;
+            final L0_2dLib.Point speed_1;
+            final L0_2dLib.Point speed_2;
 
             public Drone(PlayerAI owner, int id) {
                 this.owner = owner;
                 this.id = id;
                 this.cor = new L0_2dLib.Point();
+                this.speed_1 = new L0_2dLib.Point();
+                this.speed_2 = new L0_2dLib.Point();
+            }
+            
+            public void setForSpeed(L0_2dLib.WithCoord c){
+                speed_2.set(speed_1);
+                speed_1.set(c.x()-cor.x,c.y()-cor.y);
             }
 
             public String toString() {
@@ -579,6 +590,7 @@ public class L1_botStruct {
         public void inputTurnPlayerBot(int p, List<L0_2dLib.Point> xyZ) {
             PlayerAI pp = _player.get(p);
             for (Drone d : _drone.get(pp)) {
+                d.setForSpeed(xyZ.get(d.id));
                 d.set(xyZ.get(d.id));
             }
         }
