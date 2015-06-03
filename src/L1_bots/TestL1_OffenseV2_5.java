@@ -201,7 +201,7 @@ public class TestL1_OffenseV2_5 extends L1_botStruct.BotBase {
     }
     
     public void full_defenseRelaxed(HashSet<Drone> inuse,HashSet<Drone> lockedDrones,HashSet<Drone> neutralize){
-        Point bary=new L0_2dLib.Point();
+        L0_2dLib.Point bary=new L0_2dLib.Point();
         List<Zone> mineZ=_zone.stream().filter(e->e.owner==_me).collect(Collectors.toList());
         bary.setAsBarycentre(mineZ.get(0), 1, mineZ.get(1), 1);
         for(int i=2;i<mineZ.size();i++){
