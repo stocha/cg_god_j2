@@ -25,6 +25,11 @@ V2_3 objectifs :
 --> Quand def > 1/2 d nearest, alors il est relaché.
 --> Quand un dr ennemi a 90% de vitesse max vers un monde, alors il est a destination de ce monde a T = d/100.
 
+V2_5 objectifs :
+--> prendre en compte les captures futures pour attaques opportunistes + defenseurs
+--> prendre en compte les captures futures (y compris les notres) pour plannifier les attaque2
+--> Utiliser un mode defense special en cas de domination de l'adversaire
+--> ++?++ Detecter quand on a un bord. (et utiliser un mode defense spécial ?)
 
  */
 

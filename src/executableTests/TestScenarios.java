@@ -11,9 +11,9 @@ import L1_bots.TestL1_DefenseV2;
 import L1_bots.TestL1_GreedyBot;
 import L1_bots.TestL1_OffenseBot;
 import L1_bots.TestL1_OffenseV2;
-import L1_bots.TestL1_OffenseV2_2;
 import L1_bots.TestL1_OffenseV2_3;
 import L1_bots.TestL1_OffenseV2_4;
+import L1_bots.TestL1_OffenseV2_5;
 import world.WorldBase;
 import static world.WorldVisu.create;
 
@@ -73,7 +73,7 @@ public class TestScenarios {
     
    public static void testV2Off(){
  
-       WorldBase w=new WorldBase(9, 8, 9937777,true, new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL1_OffenseV2_3.fact), new TesterBot(TestL1_OffenseV2_2.fact));//,new TesterBot(Test1_SimpleV2.fact));
+       WorldBase w=new WorldBase(9, 8, 9966666,true, new TesterBot(TestL1_OffenseV2_5.fact), new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL1_OffenseV2_3.fact));//,new TesterBot(Test1_SimpleV2.fact));
        
         //WorldBase w=new WorldBase(11, 8, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_OffenseV2_2.fact));
         //WorldBase w=new WorldBase(11, 8, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_OffenseV2_3.fact));        
@@ -85,7 +85,7 @@ public class TestScenarios {
        
         w.genWorld();
         
-        int nbturn=100;
+        int nbturn=200;
         int pas=0;
         
         Thread genIt=new Thread(){

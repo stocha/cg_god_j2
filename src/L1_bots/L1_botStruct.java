@@ -59,116 +59,116 @@ public class L1_botStruct {
     }
 
     public static class BotBase {
-        
-    public class ThreatLevel {
 
-        public static final int maxLevel = 70;
+        public class ThreatLevel {
 
-        private int[][] t = new int[P][maxLevel + 1];
-        int sp = 1;
+            public static final int maxLevel = 70;
 
-        HashMap<PlayerAI, HashMap<Integer, List<Drone>>> droneAtLevel = new HashMap<>(P);
+            private int[][] t = new int[P][maxLevel + 1];
+            int sp = 1;
 
-        {
-            for (PlayerAI p : _player) {
-                droneAtLevel.put(p, new HashMap<>(maxLevel + 1));
+            HashMap<PlayerAI, HashMap<Integer, List<Drone>>> droneAtLevel = new HashMap<>(P);
+
+            {
+                for (PlayerAI p : _player) {
+                    droneAtLevel.put(p, new HashMap<>(maxLevel + 1));
+                }
+
             }
 
-        }
-
-        public ThreatLevel reset() {
-            sp = 1;
-            for (int p = 0; p < P; p++) {
-                t[p][0] = 0;
-            }
-            return this;
-        }
-
-        private void increastLevelTo(int level) {
-            if (level >= maxLevel - 1) {
-                return;
-            }
-            while (sp < level + 1) {
+            public ThreatLevel reset() {
+                sp = 1;
                 for (int p = 0; p < P; p++) {
-                    t[p][sp] = t[p][sp - 1];
+                    t[p][0] = 0;
                 }
-                sp++;
-            }
-        }
-
-        public void addThreat(Drone d, int level) {
-            if (level >= maxLevel - 1) {
-                return;
-            }
-            //System.err.println("Add threat " + d + " level " + level);
-
-            if (droneAtLevel.get(d.owner).get(level) == null) {
-                droneAtLevel.get(d.owner).put(level, new ArrayList<>(D));
-            }
-            droneAtLevel.get(d.owner).get(level).add(d);
-
-            increastLevelTo(level + 1);
-            t[d.owner.id][level + 1]++;
-
-        }
-
-        public int getThreatAt(PlayerAI p, int level) {
-            if (level >= maxLevel - 1) {
-                return t[p.id][maxLevel - 1];
-            }
-            return t[p.id][level + 1];
-        }
-
-        public int getMaxThreatAt(int level, PlayerAI exclude) {
-            if (level >= maxLevel - 1) {
-                return getMaxThreatAt(maxLevel - 1, exclude);
+                return this;
             }
 
-            int max = -1;
-            for (int i = 0; i < P; i++) {
-                if (i == exclude.id) {
-                    continue;
+            private void increastLevelTo(int level) {
+                if (level >= maxLevel - 1) {
+                    return;
                 }
-                if (t[i][level + 1] > max) {
-                    max = t[i][level + 1];
+                while (sp < level + 1) {
+                    for (int p = 0; p < P; p++) {
+                        t[p][sp] = t[p][sp - 1];
+                    }
+                    sp++;
                 }
             }
-            return max;
-        }
 
-        public int[] getMaxThreat(PlayerAI exclude) {
-            int[] res = new int[sp - 1];
-            for (int i = 0; i < sp - 1; i++) {
-                res[i] = getMaxThreatAt(i, exclude);
-            }
-
-            return res;
-        }
-
-        @Override
-        public String toString() {
-            String res = "";
-
-            for (int i = 0; i < P; i++) {
-                for (int level = 0; level < sp; level++) {
-                    res += "|" + t[i][level];
-
+            public void addThreat(Drone d, int level) {
+                if (level >= maxLevel - 1) {
+                    return;
                 }
-                res += "\n";
-            }
-            for (PlayerAI p : _player) {
-                res += "max for " + p + "\n";
-                for (int level = 0; level < sp - 1; level++) {
-                    res += "|" + (getMaxThreatAt(level, p)) + "";
+                //System.err.println("Add threat " + d + " level " + level);
+
+                if (droneAtLevel.get(d.owner).get(level) == null) {
+                    droneAtLevel.get(d.owner).put(level, new ArrayList<>(D));
                 }
-                res += "\n";
+                droneAtLevel.get(d.owner).get(level).add(d);
+
+                increastLevelTo(level + 1);
+                t[d.owner.id][level + 1]++;
+
             }
-            res += "" + droneAtLevel;
 
-            return res;
+            public int getThreatAt(PlayerAI p, int level) {
+                if (level >= maxLevel - 1) {
+                    return t[p.id][maxLevel - 1];
+                }
+                return t[p.id][level + 1];
+            }
+
+            public int getMaxThreatAt(int level, PlayerAI exclude) {
+                if (level >= maxLevel - 1) {
+                    return getMaxThreatAt(maxLevel - 1, exclude);
+                }
+
+                int max = -1;
+                for (int i = 0; i < P; i++) {
+                    if (i == exclude.id) {
+                        continue;
+                    }
+                    if (t[i][level + 1] > max) {
+                        max = t[i][level + 1];
+                    }
+                }
+                return max;
+            }
+
+            public int[] getMaxThreat(PlayerAI exclude) {
+                int[] res = new int[sp - 1];
+                for (int i = 0; i < sp - 1; i++) {
+                    res[i] = getMaxThreatAt(i, exclude);
+                }
+
+                return res;
+            }
+
+            @Override
+            public String toString() {
+                String res = "";
+
+                for (int i = 0; i < P; i++) {
+                    for (int level = 0; level < sp; level++) {
+                        res += "|" + t[i][level];
+
+                    }
+                    res += "\n";
+                }
+                for (PlayerAI p : _player) {
+                    res += "max for " + p + "\n";
+                    for (int level = 0; level < sp - 1; level++) {
+                        res += "|" + (getMaxThreatAt(level, p)) + "";
+                    }
+                    res += "\n";
+                }
+                res += "" + droneAtLevel;
+
+                return res;
+            }
+
         }
-
-    }        
 
         public static class CompByPlayerRzd implements Comparator<RZoneDrone> {
 
@@ -243,26 +243,30 @@ public class L1_botStruct {
             public Stream<RZoneDrone> stream() {
                 return s.stream();
             }
-            
+
             /**
-             * 
+             *
              * @param predicate (permet d'enlever des drones ...)
-             * @return 
+             * @return
              */
-            public HashMap<Zone,ThreatLevel> getThreat(Predicate<? super RZoneDrone> predicate){
+            public HashMap<Zone, ThreatLevel> getThreat(Predicate<? super RZoneDrone> predicate) {
                 List<RZoneDrone> rzb = s.stream().filter(predicate).sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
-                
+
                 HashMap<Zone, ThreatLevel> threat = new HashMap<>(Z);
-                int lastLevel=0;
+                int lastLevel = 0;
                 for (RZoneDrone r : rzb) {
-                    if(!threat.containsKey(r.z)) threat.put(r.z, new ThreatLevel().reset());     
-                    if(r.level<lastLevel) throw new RuntimeException("Invariant broken "+r.level+" < "+lastLevel);
+                    if (!threat.containsKey(r.z)) {
+                        threat.put(r.z, new ThreatLevel().reset());
+                    }
+                    if (r.level < lastLevel) {
+                        throw new RuntimeException("Invariant broken " + r.level + " < " + lastLevel);
+                    }
                     threat.get(r.z).addThreat(r.d, r.level);
-                    lastLevel=r.level;
-                }                
-                
+                    lastLevel = r.level;
+                }
+
                 return threat;
-            
+
             }
 
         }
@@ -467,7 +471,7 @@ public class L1_botStruct {
 
             final int id;
             int score = 0;
-            List<Zone> owned=new ArrayList<>(Z);
+            List<Zone> owned = new ArrayList<>(Z);
 
             public PlayerAI(int id) {
                 this.id = id;
@@ -485,6 +489,7 @@ public class L1_botStruct {
         final int D;
         final int Z;
 
+        final int[] _score;
         final PlayerAI _nullPlayer = new PlayerAI(-1);
         final PlayerAI _me;
         final List<PlayerAI> _player;
@@ -513,7 +518,7 @@ public class L1_botStruct {
 
             _drone = new HashMap<>(P);
 
-            for (PlayerAI p : _player) {                
+            for (PlayerAI p : _player) {
                 List<Drone> bbl = new ArrayList<>(D);
                 for (int d = 0; d < D; d++) {
                     Drone bb = new Drone(p, d);
@@ -531,7 +536,9 @@ public class L1_botStruct {
             res = new ArrayList<>(D);
             for (int d = 0; d < D; d++) {
                 res.add(new L0_2dLib.Point());
-            }          
+            }
+
+            _score = new int[P];
         }
 
         public void inputZones(List<L0_2dLib.Point> xyZ) {
@@ -548,6 +555,7 @@ public class L1_botStruct {
 
             for (PlayerAI p : _player) {
                 p.owned.clear();
+                p.score = 0;
             }
             _nullPlayer.owned.clear();
             for (Zone z : _zone) {
@@ -558,7 +566,14 @@ public class L1_botStruct {
                 }
 
                 z.owner.owned.add(z);
+                if (z.owner != _nullPlayer) {
+                    _score[z.owner.id]++;
+                }
             }
+            
+            for (PlayerAI p : _player) {
+                p.score = _score[p.id];
+            }            
         }
 
         public void inputTurnPlayerBot(int p, List<L0_2dLib.Point> xyZ) {
