@@ -14,6 +14,7 @@ import L1_bots.TestL1_OffenseV2;
 import L1_bots.TestL1_OffenseV2_3;
 import L1_bots.TestL1_OffenseV2_4;
 import L1_bots.TestL1_OffenseV2_5;
+import L1_bots.TestL2_BiBot_V1_1_N_1_1;
 import world.WorldBase;
 import static world.WorldVisu.create;
 
@@ -72,8 +73,25 @@ public class TestScenarios {
     
     
    public static void testV2Off(){
+       
+       //TestL2_BiBot_V1_1_N_1_1
+       
+        WorldBase w=new WorldBase(9, 8, 9966666,true,  new TesterBot(TestL2_BiBot_V1_1_N_1_1.fact), new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL1_OffenseV2_3.fact));//,new TesterBot(Test1_SimpleV2.fact))       
+       
+//       WorldBase w=new WorldBase(3, 4, 9966666,true,  new TesterBot(new L1_botStruct.BotFactory() {
+//
+//           @Override
+//           public L1_botStruct.BotBase alloc(int P, int Id, int D, int Z) {
+//                    if(P==2){
+//                                return new TestL1_GreedyBot(P, Id, D, Z);
+//                    }else{
+//                                return new TestL1_OffenseV2_4(P, Id, D, Z);
+//                    }
+//           }
+//       }), new TesterBot(TestL1_OffenseV2_4.fact));//,new TesterBot(Test1_SimpleV2.fact))
+       //WorldBase w=new WorldBase(9, 8, 9966666,true,  new TesterBot(TestL2_BiBot_V1_1_N_1_1.fact), new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL1_OffenseV2_3.fact));//,new TesterBot(Test1_SimpleV2.fact))
  
-       WorldBase w=new WorldBase(9, 8, 9966666,true, new TesterBot(TestL1_OffenseV2_5.fact), new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL1_OffenseV2_3.fact));//,new TesterBot(Test1_SimpleV2.fact));
+       //WorldBase w=new WorldBase(9, 8, 9966666,true, new TesterBot(TestL1_OffenseV2_5.fact), new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL1_OffenseV2_3.fact));//,new TesterBot(Test1_SimpleV2.fact));
        
         //WorldBase w=new WorldBase(11, 8, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_OffenseV2_2.fact));
         //WorldBase w=new WorldBase(11, 8, 9937777,new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact),new TesterBot(TestL1_GreedyBot.fact), new TesterBot(TestL1_OffenseV2_3.fact));        
