@@ -33,15 +33,19 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
         
         public class State{
             final int id;
-            final L0_2dLib.Point coord;            
+            final L0_2dLib.WithCoord realityLink;
 
             public State(int id, L0_2dLib.WithCoord coord) {
                 this.id = id;
-                this.coord=new L0_2dLib.Point();
-                this.coord.set(coord);
+                realityLink=coord;
             }
 
+            @Override
+            public String toString() {
+                return "State{" + "id=" + id + ", realityLink=" + realityLink + '}';
+            }
 
+            
         }
 
         public class Transition{
@@ -56,7 +60,16 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
                 this.start = start;
                 this.end = end;
             }
+
+            @Override
+            public String toString() {
+                return "Transition{" + "id=" + id + ", cost=" + cost + ", start=" + start + ", end=" + end + '}';
+            }
+            
+            
         }        
+        
+        
     
     
         final List<State> state=new ArrayList<>(4*3);
@@ -85,7 +98,7 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
                 stateTrans.put(start, new ArrayList<>(100));
             }
             if(!stateTrans.containsKey(end)){
-                stateTrans.put(start, new ArrayList<>(100));
+                stateTrans.put(end, new ArrayList<>(100));
             }            
 
             stateTrans.get(start).add(tt1);
@@ -126,10 +139,26 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
             
         }
         
-    }
+        final String debug(){
+            String res="";
+            
+            for(State s : state){
+                res+=""+s+"\n";
+                res+=""+stateTrans.get(s)+"\n";
+            
+            }
+            
+            return res;
+        }
+        
+    }// Automat
     
-    public void calcAutomat(){
+    public Automat calcAutomat(){
         outputText("Calc automat");
+        
+        Automat aut =new Automat();
+        aut.buildIt();
+        outputText(""+aut.debug());
         
         final RZoneZone first;
         RZoneZone second;
@@ -153,6 +182,8 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
         
         second=lrzz.get(0);
         _order.get(allDrone.get(1)).set(second);
+        
+        return aut;
         
     }    
 
@@ -224,17 +255,25 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
     public static L1_botStruct.BotFactory fact=(int P1, int Id1, int D1, int Z1) -> new Test1L_Solver4_3_2(P1, Id1, D1, Z1);
 
     @Override
+    public void inputTurnPlayerBot(int p, List<L0_2dLib.Point> xyZ) {
+        super.inputTurnPlayerBot(p, xyZ); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void inputZones(List<L0_2dLib.Point> xyZ) {
+        super.inputZones(xyZ); //To change body of generated methods, choose Tools | Templates.
+        
+        calcAutomat();
+    }
+
+    
+    
+    @Override
     public List<L0_2dLib.Point> outorders() {
         
         
-        System.err.println("generating orders "+_turnNumber);
+        System.err.println("generating orders "+_turnNumber);       
 
-        L1_botStruct.BotBase.Zone cible=null;
-        
-        
-        HashMap<Drone,Boolean> droneDone=new HashMap(D);
-        
-        calcAutomat();
         
         
         return super.outorders(); //To change body of generated methods, choose Tools | Templates.
