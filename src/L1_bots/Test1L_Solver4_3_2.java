@@ -7,6 +7,7 @@
 package L1_bots;
 
 import L0_tools.L0_2dLib;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +19,142 @@ import java.util.stream.Collectors;
 public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
     
     final int nbMoveForward=100;
+    
+
+    public void outputText(String t) {
+        if(false) return;
+        
+        System.err.println("" + this.getClass().getSimpleName() + " " + t);
+    }    
+    
+
+    
+    public class Automat{
+        
+        public class State{
+            final int id;
+            final L0_2dLib.Point coord;            
+
+            public State(int id, L0_2dLib.WithCoord coord) {
+                this.id = id;
+                this.coord=new L0_2dLib.Point();
+                this.coord.set(coord);
+            }
+
+
+        }
+
+        public class Transition{
+            final int id;
+            final int cost;
+            final State start;
+            final State end;
+
+            public Transition(int id, int cost, State start, State end) {
+                this.id = id;
+                this.cost = cost;
+                this.start = start;
+                this.end = end;
+            }
+        }        
+    
+    
+        final List<State> state=new ArrayList<>(4*3);
+        final List<Transition> transition=new ArrayList<>(4*4*4);
+        final HashMap<State,List<Transition>> stateTrans=new HashMap<>(Z*Z);
+        
+        int idState=0;
+        int idTransition=0;        
+        
+        
+        final HashMap<Zone,State> ztos=new HashMap<>(Z);        
+        
+        private State addState(L0_2dLib.WithCoord coord){
+            State s=new State(idState++,coord);
+            this.state.add(s);
+            return s;
+        }
+        
+        private Transition addTransition(int cost, State start, State end){
+            Transition tt1=new Transition(idTransition++, cost, start, end);
+            Transition tt2=new Transition(idTransition++, cost, end, start);
+            
+            this.transition.add(tt1);this.transition.add(tt2);
+            
+            if(!stateTrans.containsKey(start)){
+                stateTrans.put(start, new ArrayList<>(100));
+            }
+            if(!stateTrans.containsKey(end)){
+                stateTrans.put(start, new ArrayList<>(100));
+            }            
+
+            stateTrans.get(start).add(tt1);
+            stateTrans.get(end ).add(tt2);
+            
+            
+            return tt1;
+            
+        }
+        
+        final void buildIt(){
+
+            
+            Automat au=new Automat();
+            
+
+            List<RZoneZone> lrzz=_buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
+            
+            for(RZoneZone z : lrzz){
+                if(!ztos.containsKey(z.a)){
+                    State s=addState(z.a);
+                    ztos.put(z.a, s);
+                }
+                if(!ztos.containsKey(z.b)){
+                    State s=addState(z.b);
+                    ztos.put(z.b, s);
+                }                
+                
+                int cost=(int)((z.distance+99)/100);
+                addTransition(cost, ztos.get(z.a), ztos.get(z.b));
+   
+                
+                
+                
+            
+            }
+            
+            
+        }
+        
+    }
+    
+    public void calcAutomat(){
+        outputText("Calc automat");
+        
+        final RZoneZone first;
+        RZoneZone second;
+        RZoneZone third=null;
+        
+        List<RZoneZone> lrzz=_buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
+        List<Drone> allDrone=_drone.get(_me);
+        first=lrzz.get(0);
+        _order.get(allDrone.get(0)).set(first);
+        
+        outputText("Selected first segment "+first);
+        for(RZoneZone it : lrzz)
+        {
+
+            //outputText(" "+it);
+        }
+        
+        lrzz=_buildRZoneZone().setDistance().stream()
+                .filter( e->((e.a!=first.a) && (e.a!=first.b) && (e.b!=first.a) && (e.b!=first.b)) )
+                        .sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());        
+        
+        second=lrzz.get(0);
+        _order.get(allDrone.get(1)).set(second);
+        
+    }    
 
     public Test1L_Solver4_3_2(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
@@ -97,16 +234,7 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
         
         HashMap<Drone,Boolean> droneDone=new HashMap(D);
         
-
-        for(RZoneDrone rzd : this._buildRZoneDrone().setDistanceCalc().stream().sorted(comp_rzd_byDist.reversed()).collect(Collectors.toList())){
-           // System.err.println(""+rzd);
-            
-            if(rzd.d.owner==_me && !droneDone.containsKey(rzd.d) && rzd.z.owner!=_me){
-                _order.get(rzd.d).set(rzd.z);
-             //   System.err.println(""+rzd.d+" is heading to "+rzd.z);
-                droneDone.put(rzd.d, true);
-            }        
-        }
+        calcAutomat();
         
         
         return super.outorders(); //To change body of generated methods, choose Tools | Templates.

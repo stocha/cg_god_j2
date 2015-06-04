@@ -18,7 +18,7 @@ public class TestL2_BiBot_V1_1_N_1_1  {
            @Override
            public L1_botStruct.BotBase alloc(int P, int Id, int D, int Z) {
                     if(P==2){
-                                return new TestL1_GreedyBot(P, Id, D, Z);
+                                return new Test1L_Solver4_3_2(P, Id, D, Z);
                     }else{
                                 return new TestL1_OffenseV2_4(P, Id, D, Z);
                     }
