@@ -9,6 +9,7 @@ import L0_tools.L0_2dLib;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -197,10 +198,13 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
                 final int owner[];
                 final int score[];
                 
+                int date;
+                
                 public void copyStatCost(SimState src){
                     for(int i=0;i<src.tostate.length;i++){
                         this.tostate[i]=src.tostate[i];
                         this.cost[i]=src.cost[i];
+                        this.date=src.date;
                     }                    
                 }
 
@@ -228,17 +232,46 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
                 }
 
             }
+            
+            public class ChoiceSpace{
+                List<List<Choice>> choicePerDrone=new ArrayList<>(D);
 
-            public class ChoiceVec {
-
-                final int date;
-                final List<Choice> cl = new ArrayList<>(4 * 4);
-
-                public ChoiceVec(int time) {
-                    this.date = time;
+                public ChoiceSpace(SimState from) {
+                    for(int i=0;i<from.cost.length;i++){
+                        if(from.cost[i]==0){
+                            List<Choice> cc=new ArrayList<>();
+                            choicePerDrone.add(cc);
+                            
+                            int nb=stateTrans.get(state.get(i)).size();
+                            for(Transition t : stateTrans.get(state.get(i))){
+                                cc.add(new Choice(i, t.id, 1024/nb));                            
+                            }
+                        }                        
+                    }                    
                 }
-
-            }// Simulation        
+                
+                public List<Choice> reduce(Random rand){
+                    List<Choice> res=new ArrayList<>();
+                    
+                    
+                    for(List<Choice> drc : choicePerDrone){
+                        Choice last=drc.get(0);
+                        int ranc=rand.nextInt()&1023;
+                        int acc=0;
+                        
+                        for(Choice curc : drc){
+                            acc+=curc.transWeight;
+                            if(acc >= ranc) break;
+                            
+                            last=curc;
+                        }
+                        res.add(last);
+                    }
+                    
+                    return res;
+                }
+                
+            }     
 
         }// Automat
 
