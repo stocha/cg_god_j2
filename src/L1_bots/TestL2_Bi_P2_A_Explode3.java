@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
  *
  * @author Jahan
  */
-public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
+public class TestL2_Bi_P2_A_Explode3  extends L1_botStruct.BotBase {
 
-    public TestL2_Bibot_P2_V1_1(int P, int Id, int D, int Z) {
+    public TestL2_Bi_P2_A_Explode3(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
     }
 
-    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL2_Bibot_P2_V1_1(P1, Id1, D1, Z1);
+    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL2_Bi_P2_A_Explode3(P1, Id1, D1, Z1);
 
 
     public void outputText(String t) {
@@ -160,50 +160,38 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
         at.putIfAbsent(geom.b,new ArrayList<>(D));
         at.putIfAbsent(geom.c,new ArrayList<>(D));
         at.putIfAbsent(geom.d,new ArrayList<>(D));
-        at.putIfAbsent(geom.ab,new ArrayList<>(D));
-        at.putIfAbsent(geom.ac,new ArrayList<>(D));
-        at.putIfAbsent(geom.bc,new ArrayList<>(D));
-        at.putIfAbsent(geom.ad,new ArrayList<>(D));        
         
         for(Drone d : _drone.get(_me)){
             if(!plan.got.containsKey(d)){
-                plan.got.put(d, geom.a);                
+                plan.got.put(d, geom.d);                
             }        
-            
             L0_2dLib.WithCoord dst=plan.got.get(d);
             if(d.dist(dst)<=100){
                 at.putIfAbsent(dst,new ArrayList<>(D));
                 at.get(dst).add(d);
             }
-        }        
+        }
+        
+        if( at.get(geom.d).size()==3){
+            for(Drone d : at.get(geom.d)){
+                 plan.got.put(d, geom.a);
+            }
+        
+        }
         
         if( at.get(geom.a).size()==3){
             List<Drone> them=at.get(geom.a);
             plan.got.put(them.get(0), geom.d);
-            plan.got.put(them.get(1), geom.bc);
-            plan.got.put(them.get(2), geom.d);                    
+            plan.got.put(them.get(1), geom.b);
+            plan.got.put(them.get(2), geom.c);                    
         }
         
-        if( at.get(geom.d).size()==2 && at.get(geom.bc).size()==1  ){
-            plan.got.put(at.get(geom.d).get(0), geom.b);
-            plan.got.put(at.get(geom.d).get(1), geom.b);         
+        if( at.get(geom.d).size()==1 && at.get(geom.b).size()==1 && at.get(geom.c).size()==1 ){
+            for(Drone d : _drone.get(_me)){
+                 plan.got.put(d, geom.a);
+            }            
             
         }
-        
-        if( at.get(geom.b).size()==2 && at.get(geom.bc).size()==1  ){
-            plan.got.put(at.get(geom.b).get(0), geom.c);
-            plan.got.put(at.get(geom.b).get(1), geom.c);                                 
-        }        
-        
-        if( at.get(geom.c).size()==2 && at.get(geom.bc).size()==1  ){
-            plan.got.put(at.get(geom.c).get(0), geom.a);
-            plan.got.put(at.get(geom.c).get(1), geom.a);                                 
-        }         
-        
-        if( at.get(geom.a).size()==2 && at.get(geom.bc).size()==1  ){
-            plan.got.put(at.get(geom.a).get(0), geom.d);
-            plan.got.put(at.get(geom.a).get(1), geom.d);                                 
-        }         
         
         
         
