@@ -70,31 +70,12 @@ public class TestL2_Bibot_P2_V1_1 extends L1_botStruct.BotBase {
         private void planA() {
 
             if (true && tsz(geom.a,3)) {
-                List<Drone> them = plan.at.get(geom.a);
-                put(geom.a,0,geom.a);
-                put(geom.a,1,geom.d);
-                put(geom.a,2,geom.bc);
+                put(geom.a,0,geom.c);
+                put(geom.a,1,geom.b);
+                put(geom.a,2,geom.b);
             }
-            
-            if (true && tsz(geom.a,1) && tsz(geom.d,1) && tsz(geom.bc,1) ) {
-                put(geom.a,0,geom.bc);
-            }                            
-            
-            if (true && tsz(geom.a,0) && tsz(geom.d,1) && tsz(geom.bc,2) ) {
-                put(geom.d,0,geom.a);
-                put(geom.bc,0,geom.b);
-                put(geom.bc,1,geom.b);
-            }       
-            
-            if (true && tsz(geom.a,1) && tsz(geom.b,2) && tsz(geom.bc,0) ) {
-                put(geom.b,0,geom.a);
-                put(geom.b,1,geom.a);
-            }         
-            
-            if (true && tsz(geom.a,3) && tsz(geom.d,0) && tsz(geom.bc,1) ) {
-               // put(geom.b,0,geom.ab);
-               // put(geom.b,1,geom.ab);
-            }              
+                                    
+                     
 
         }
 
@@ -247,9 +228,31 @@ public class TestL2_Bibot_P2_V1_1 extends L1_botStruct.BotBase {
                 d = z;
             }
         }
+        
+        Zone b=null;
+        for (RZoneZone rz : lrzz) {
+            if ((rz.a!=d) & rz.b!=d) {
+                continue;
+            }
+            if ((rz.a==a) || rz.b==a) {
+                continue;
+            }            
+            if (principaux.contains(rz)) {
+                continue;
+            }
+            
+            // on a trouve d <--> b
+            b=otherZ(d, rz);
+            break;
+        }        
+        
 
-        Zone b = otherZ(a, stt.get(a).get(0));
-        Zone c = otherZ(a, stt.get(a).get(1));
+        Zone c1 = otherZ(a, stt.get(a).get(0));
+        Zone c2 = otherZ(a, stt.get(a).get(1));
+        
+        Zone c;
+        
+        if(c1==b) c=c2; else c=c1;
 
         System.err.println("From b : " + stt.get(b));
         RZoneZone bc = null;
