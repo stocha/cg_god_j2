@@ -3,6 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package L1_bots;
 
 import L0_tools.L0_2dLib;
@@ -16,13 +17,13 @@ import java.util.stream.Collectors;
  *
  * @author Jahan
  */
-public class TestL2_Bibot_P2_V1_1 extends L1_botStruct.BotBase {
+public class TestL2_Bi_P2_OnduleV2 extends L1_botStruct.BotBase {
 
-    public TestL2_Bibot_P2_V1_1(int P, int Id, int D, int Z) {
+    public TestL2_Bi_P2_OnduleV2(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
     }
 
-    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL2_Bibot_P2_V1_1(P1, Id1, D1, Z1);
+    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL2_Bi_P2_OnduleV2(P1, Id1, D1, Z1);
 
     public void outputText(String t) {
         if (false) {
