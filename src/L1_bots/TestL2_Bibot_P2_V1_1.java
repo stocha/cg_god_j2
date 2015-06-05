@@ -32,6 +32,12 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
         System.err.println("" + this.getClass().getSimpleName() + " " + t);
     }
     
+    public class Planning{
+        HashMap<Drone,L0_2dLib.WithCoord> got=new HashMap<>(D);
+        
+        
+    }
+    
 
     
     public class Geometry{
@@ -144,11 +150,58 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
         
     }
     
+    Planning plan=new Planning();
+    
     private void doSimpleOrder(){
+        
+        HashMap<L0_2dLib.WithCoord,List<Drone>> at=new HashMap<>(8);
+        
+        at.putIfAbsent(geom.a,new ArrayList<>(D));
+        at.putIfAbsent(geom.b,new ArrayList<>(D));
+        at.putIfAbsent(geom.c,new ArrayList<>(D));
+        at.putIfAbsent(geom.d,new ArrayList<>(D));
+        
         for(Drone d : _drone.get(_me)){
-            _order.get(d).set(geom.d);
+            if(!plan.got.containsKey(d)){
+                plan.got.put(d, geom.d);                
+            }        
+            L0_2dLib.WithCoord dst=plan.got.get(d);
+            if(d.dist(dst)<=100){
+                at.putIfAbsent(dst,new ArrayList<>(D));
+                at.get(dst).add(d);
+            }
         }
         
+        if( at.get(geom.d).size()==3){
+            for(Drone d : at.get(geom.d)){
+                 plan.got.put(d, geom.a);
+            }
+        
+        }
+        
+        if( at.get(geom.a).size()==3){
+            List<Drone> them=at.get(geom.a);
+            plan.got.put(them.get(0), geom.d);
+            plan.got.put(them.get(1), geom.b);
+            plan.got.put(them.get(2), geom.c);                    
+        }
+        
+        if( at.get(geom.d).size()==1 && at.get(geom.b).size()==1 && at.get(geom.c).size()==1 ){
+            for(Drone d : _drone.get(_me)){
+                 plan.got.put(d, geom.a);
+            }            
+            
+        }
+        
+        
+        
+        
+        
+        
+        for(Drone d : _drone.get(_me)){
+             _order.get(d).set(plan.got.get(d));
+        }
+
     }
 
     @Override
