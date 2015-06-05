@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
  *
  * @author Jahan
  */
-public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
+public class TestL2_Bi_P2_A_FixBc_Rotate  extends L1_botStruct.BotBase {
 
-    public TestL2_Bibot_P2_V1_1(int P, int Id, int D, int Z) {
+    public TestL2_Bi_P2_A_FixBc_Rotate(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
     }
 
-    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL2_Bibot_P2_V1_1(P1, Id1, D1, Z1);
+    public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL2_Bi_P2_A_FixBc_Rotate(P1, Id1, D1, Z1);
 
 
     public void outputText(String t) {
@@ -35,59 +35,7 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
     public class Planning{
         HashMap<Drone,L0_2dLib.WithCoord> got=new HashMap<>(D);
         
-        HashMap<L0_2dLib.WithCoord,List<Drone>> at=new HashMap<>(8);
-        HashMap<L0_2dLib.WithCoord,List<Drone>> atenemy=new HashMap<>(8);      
         
-        public void init(){
-            plan.at.putIfAbsent(geom.a,new ArrayList<>(D));
-            plan.at.putIfAbsent(geom.b,new ArrayList<>(D));
-            plan.at.putIfAbsent(geom.c,new ArrayList<>(D));
-            plan.at.putIfAbsent(geom.d,new ArrayList<>(D));
-            plan.at.putIfAbsent(geom.ab,new ArrayList<>(D));
-            plan.at.putIfAbsent(geom.ac,new ArrayList<>(D));
-            plan.at.putIfAbsent(geom.bc,new ArrayList<>(D));
-            plan.at.putIfAbsent(geom.ad,new ArrayList<>(D));   
-
-            plan.atenemy.putIfAbsent(geom.a,new ArrayList<>(D));
-            plan.atenemy.putIfAbsent(geom.b,new ArrayList<>(D));
-            plan.atenemy.putIfAbsent(geom.c,new ArrayList<>(D));
-            plan.atenemy.putIfAbsent(geom.d,new ArrayList<>(D));
-            plan.atenemy.putIfAbsent(geom.ab,new ArrayList<>(D));
-            plan.atenemy.putIfAbsent(geom.ac,new ArrayList<>(D));
-            plan.atenemy.putIfAbsent(geom.bc,new ArrayList<>(D));
-            plan.atenemy.putIfAbsent(geom.ad,new ArrayList<>(D));          
-        }
-        
-        public void countDronesAt(){
-        PlayerAI enemyp=_player.get(_me.id^1);
-        
-
-            //-------------- Friendly drone count
-            for(Drone d : _drone.get(_me)){
-                if(!plan.got.containsKey(d)){                
-                    plan.got.put(d, geom.a);                
-                }        
-
-                L0_2dLib.WithCoord dst=plan.got.get(d);
-                if(d.dist(dst)<=100){
-                    at.get(dst).add(d);
-                }
-            }       
-            //-------------- E drone count
-            for(Drone d : _drone.get(enemyp)){       
-                for(L0_2dLib.WithCoord cc : geom.all){
-                L0_2dLib.WithCoord dst=cc;
-                if(d.dist(dst)<=100){
-                    atenemy.get(dst).add(d);
-                }                    
-                    
-                }
-                
-
-            }          
-            //----- End drone count        
-        
-        }
     }
     
 
@@ -102,8 +50,6 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
         final RZoneZone ac;
         final RZoneZone bc;
         final RZoneZone ad;
-        
-        final List<L0_2dLib.WithCoord> all=new ArrayList<>(8);
 
         public Geometry(Zone a, Zone b, Zone c, Zone d, RZoneZone ab, RZoneZone ac, RZoneZone bc, RZoneZone ad) {
             this.a = a;
@@ -114,16 +60,6 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
             this.ac = ac;
             this.bc = bc;
             this.ad = ad;
-            
-            all.add(a);
-            all.add(b);
-            all.add(c);
-            all.add(d);
-            
-            all.add(ab);
-            all.add(ac);
-            all.add(ad);
-            all.add(bc);
         }
 
         @Override
@@ -145,7 +81,7 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
     }
     
     private Geometry calcTransition(){
-        HashMap<Zone,List<RZoneZone>> stt=new HashMap<>(4);  
+        HashMap<Zone,List<RZoneZone>> stt=new HashMap<>(4);     
         List<RZoneZone> principaux=new ArrayList<>(3);        
 
         List<RZoneZone> lrzz=_buildRZoneZone().setDistance().stream().sorted(comp_zz_bydist.reversed()).collect(Collectors.toList());
@@ -216,38 +152,57 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
     
     Planning plan=new Planning();
     
-    private void doSimpleOrder(){              
+    private void doSimpleOrder(){
         
-       
+        HashMap<L0_2dLib.WithCoord,List<Drone>> at=new HashMap<>(8);
         
-
+        at.putIfAbsent(geom.a,new ArrayList<>(D));
+        at.putIfAbsent(geom.b,new ArrayList<>(D));
+        at.putIfAbsent(geom.c,new ArrayList<>(D));
+        at.putIfAbsent(geom.d,new ArrayList<>(D));
+        at.putIfAbsent(geom.ab,new ArrayList<>(D));
+        at.putIfAbsent(geom.ac,new ArrayList<>(D));
+        at.putIfAbsent(geom.bc,new ArrayList<>(D));
+        at.putIfAbsent(geom.ad,new ArrayList<>(D));        
         
-        if( plan.at.get(geom.a).size()==3){
-            List<Drone> them=plan.at.get(geom.a);
+        for(Drone d : _drone.get(_me)){
+            if(!plan.got.containsKey(d)){
+                plan.got.put(d, geom.a);                
+            }        
+            
+            L0_2dLib.WithCoord dst=plan.got.get(d);
+            if(d.dist(dst)<=100){
+                at.putIfAbsent(dst,new ArrayList<>(D));
+                at.get(dst).add(d);
+            }
+        }        
+        
+        if( at.get(geom.a).size()==3){
+            List<Drone> them=at.get(geom.a);
             plan.got.put(them.get(0), geom.d);
             plan.got.put(them.get(1), geom.bc);
             plan.got.put(them.get(2), geom.d);                    
         }
         
-        if( plan.at.get(geom.d).size()==2 && plan.at.get(geom.bc).size()==1  ){
-            plan.got.put(plan.at.get(geom.d).get(0), geom.b);
-            plan.got.put(plan.at.get(geom.d).get(1), geom.b);         
+        if( at.get(geom.d).size()==2 && at.get(geom.bc).size()==1  ){
+            plan.got.put(at.get(geom.d).get(0), geom.b);
+            plan.got.put(at.get(geom.d).get(1), geom.b);         
             
         }
         
-        if( plan.at.get(geom.b).size()==2 && plan.at.get(geom.bc).size()==1  ){
-            plan.got.put(plan.at.get(geom.b).get(0), geom.c);
-            plan.got.put(plan.at.get(geom.b).get(1), geom.c);                                 
+        if( at.get(geom.b).size()==2 && at.get(geom.bc).size()==1  ){
+            plan.got.put(at.get(geom.b).get(0), geom.c);
+            plan.got.put(at.get(geom.b).get(1), geom.c);                                 
         }        
         
-        if( plan.at.get(geom.c).size()==2 && plan.at.get(geom.bc).size()==1  ){
-            plan.got.put(plan.at.get(geom.c).get(0), geom.a);
-            plan.got.put(plan.at.get(geom.c).get(1), geom.a);                                 
+        if( at.get(geom.c).size()==2 && at.get(geom.bc).size()==1  ){
+            plan.got.put(at.get(geom.c).get(0), geom.a);
+            plan.got.put(at.get(geom.c).get(1), geom.a);                                 
         }         
         
-        if( plan.at.get(geom.a).size()==2 && plan.at.get(geom.bc).size()==1  ){
-            plan.got.put(plan.at.get(geom.a).get(0), geom.d);
-            plan.got.put(plan.at.get(geom.a).get(1), geom.d);                                 
+        if( at.get(geom.a).size()==2 && at.get(geom.bc).size()==1  ){
+            plan.got.put(at.get(geom.a).get(0), geom.d);
+            plan.got.put(at.get(geom.a).get(1), geom.d);                                 
         }         
         
         
@@ -263,7 +218,7 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
 
     @Override
     public List<L0_2dLib.Point> outorders() {
-        plan.countDronesAt();
+        
         
 
         HashSet<Drone> inuseDrones = new HashSet<>();
@@ -279,15 +234,6 @@ public class TestL2_Bibot_P2_V1_1  extends L1_botStruct.BotBase {
         super.inputZones(xyZ); 
         geom=calcTransition();       
         outputText(""+geom);
-        
-        plan.init();
     }
-
-    @Override
-    public void inputTurnPlayerBot(int p, List<L0_2dLib.Point> xyZ) {
-        super.inputTurnPlayerBot(p, xyZ); //To change body of generated methods, choose Tools | Templates.
-    }
-    
-    
 
 }
