@@ -15,6 +15,7 @@ import L1_bots.TestL1_OffenseV2_3;
 import L1_bots.TestL1_OffenseV2_4;
 import L1_bots.TestL1_OffenseV2_5;
 import L1_bots.TestL2_BiBot_V1_1_N_1_1;
+import L1_bots.TestL2_Bibot_P2_V1_1;
 import world.WorldBase;
 import static world.WorldVisu.create;
 
@@ -77,7 +78,7 @@ public class TestScenarios {
        //TestL2_BiBot_V1_1_N_1_1
        
        
- WorldBase w=new WorldBase(2, 4, 9966666,true,  new TesterBot(TestL2_BiBot_V1_1_N_1_1.fact), new TesterBot(TestL1_OffenseV2_4.fact)); // 1 vs 1             
+ WorldBase w=new WorldBase(3, 4, 9966666,true,  new TesterBot(TestL2_Bibot_P2_V1_1.fact), new TesterBot(TestL1_OffenseV2_4.fact)); // 1 vs 1             
        // WorldBase w=new WorldBase(9, 8, 9966666,true,  new TesterBot(TestL2_BiBot_V1_1_N_1_1.fact), new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL1_OffenseV2_3.fact));//,new TesterBot(Test1_SimpleV2.fact))       
        
 //       WorldBase w=new WorldBase(3, 4, 9966666,true,  new TesterBot(new L1_botStruct.BotFactory() {
@@ -105,7 +106,7 @@ public class TestScenarios {
        
         w.genWorld();
         
-        int nbturn=2;
+        int nbturn=50;
         int pas=0;
         
         Thread genIt=new Thread(){

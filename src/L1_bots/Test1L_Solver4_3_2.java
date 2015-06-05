@@ -163,6 +163,10 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
             final SimState start;
             
             
+            /**
+             * Do a simulation
+             * @param nbTurn 
+             */
             public void simulate(int nbTurn){
                 SimState ss=new SimState();
                 ss.copyStatCost(start);
@@ -194,10 +198,6 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
                 final int tostate[];
                 final int cost[];
                 
-                final int nbDrAt[];
-                final int owner[];
-                final int score[];
-                
                 int date;
                 
                 public void copyStatCost(SimState src){
@@ -211,11 +211,18 @@ public class Test1L_Solver4_3_2 extends L1_botStruct.BotBase {
                 public SimState() {
                     int nbDr = alldr.size();
                     this.tostate = new int[nbDr];
-                    this.cost = new int[nbDr];
-                    
-                    nbDrAt=new int[state.size()];
-                    owner=new int[state.size()];
-                    score =new int[P];
+                    this.cost = new int[nbDr];                    
+                }
+                
+                public boolean incDate(){
+                    date++;
+                    boolean hasZero=false;
+                    for(int i=0;i<cost.length;i++){
+                        cost[i]--;
+                        hasZero|=(cost[i]==0);
+                    }
+                                                           
+                    return hasZero;
                 }
             }
 
