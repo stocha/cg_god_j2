@@ -3,6 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
 
+V2_6 objectifs :
+- Attaque par anticipation
+- Clouage
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------
+
 V2_3 objectifs :
 - Contrer le joueur gagnant ( score syscontrol 2 / 3+   ---  ?)
 - Ignorer les drones en lock (facile)
@@ -30,6 +42,7 @@ V2_5 objectifs :
 --> prendre en compte les captures futures (y compris les notres) pour plannifier les attaque2
 --> Utiliser un mode defense special en cas de domination de l'adversaire
 --> ++?++ Detecter quand on a un bord. (et utiliser un mode defense spécial ?)
+
 
  */
 

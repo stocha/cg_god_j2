@@ -67,20 +67,41 @@ public class TestL2_Bibot_P2_V1_1 extends L1_botStruct.BotBase {
             plan.got.put(plan.at.get(curr).get(ind), dst);         
         }
 
-        private void planA() {
-
-            if (true && tsz(geom.a,3)) {
-                put(geom.a,0,geom.c);
-                put(geom.a,1,geom.b);
-                put(geom.a,2,geom.b);
+        private void planA(HashSet<Drone> inuse) {
+            
+            if(geom.c.owner==_nullPlayer){
+                for(RZoneDrone rzd : _buildRZoneDrone().stream().filter(e -> e.d.owner == _me && !inuse.contains(e.d) && e.z==geom.c)
+                                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList())){
+                    inuse.add(rzd.d);
+                    plan.got.put(rzd.d,geom.c);
+                    break;
+                }
             }
+            
+            if(geom.d.owner==_nullPlayer){
+                for(RZoneDrone rzd : _buildRZoneDrone().stream().filter(e -> e.d.owner == _me && !inuse.contains(e.d) && e.z==geom.d)
+                                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList())){
+                    inuse.add(rzd.d);
+                    plan.got.put(rzd.d,geom.d);
+                    break;
+                }
+            }     
+            
+            if(geom.b.owner==_nullPlayer){
+                for(RZoneDrone rzd : _buildRZoneDrone().stream().filter(e -> e.d.owner == _me && !inuse.contains(e.d) && e.z==geom.b)
+                                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList())){
+                    inuse.add(rzd.d);
+                    plan.got.put(rzd.d,geom.b);
+                    break;
+                }
+            }               
                                     
                      
 
         }
 
-        public void planIt() {
-            planA();
+        public void planIt(HashSet<Drone> inuse) {
+            planA(inuse);
         }
 
         public void countDronesAt() {
@@ -271,15 +292,143 @@ public class TestL2_Bibot_P2_V1_1 extends L1_botStruct.BotBase {
 
     Planning plan = new Planning();
 
-    private void doSimpleOrder() {
+    private void doSimpleOrder(HashSet<Drone> inuse) {
 
-        plan.planIt();
+        plan.planIt(inuse);
 
         for (Drone d : _drone.get(_me)) {
             _order.get(d).set(plan.got.get(d));
         }
 
     }
+    
+    public void forceAnalysis(){
+        HashMap<Zone, ThreatLevel> threat = _buildRZoneDrone().setDistanceCalc().getThreat(e -> true);                
+    }
+    
+    public class ZoneDef {
+
+        List<Drone> defDrone = new ArrayList<>(D);
+
+        @Override
+        public String toString() {
+            return "ZoneDef{" + "" + defDrone + '}';
+        }
+
+    }    
+    
+    HashMap<Zone,ZoneDef> zoneDefInfo = new HashMap<>(Z);
+    HashMap<Drone, Zone> droneDefInfo = new HashMap<>(D);
+
+    HashMap<Zone, Boolean> ownedPrev = new HashMap<>(Z);    
+    int DronePerPlanet = D / 3;
+    List<Drone> attDrones = new ArrayList<>(D);
+    
+    RZoneDroneSet rzdStruct = null;    
+    
+    public void conquestTest() {
+        //System.err.println("owned prev "+ownedPrev);
+        for (Zone z : _zone) {
+            if (ownedPrev.get(z) != (z.owner == _me)) {
+                if (z.owner == _me) {
+                    //conquest
+                    // System.err.println("Conquest " + z);
+
+                    int defd = DronePerPlanet;
+                    for (RZoneDrone rzd : rzdStruct.stream()
+                            .filter(e -> e.d.owner == _me && attDrones.contains(e.d) && e.z == z && e.level < 3)
+                            .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList())) {
+
+                        zoneDefInfo.get(z).defDrone.add(rzd.d);
+                        droneDefInfo.put(rzd.d, z);
+                        defd--;
+                        if (defd == 0) {
+                            break;
+                        }
+                    }
+                    attDrones.removeAll(zoneDefInfo.get(z).defDrone);
+
+                    //System.err.println(""+this.getClass().getSimpleName()+" Conquest def "+z+" " + zoneDefInfo.get(z).defDrone+" att "+attDrones);
+                } else {
+                    // lost
+                    //System.err.println("Lost " + z+" "+zoneDefInfo.get(z).defDrone);
+                    attDrones.addAll(zoneDefInfo.get(z).defDrone);
+                    for (Drone d : zoneDefInfo.get(z).defDrone) {
+                        droneDefInfo.remove(d);
+                    }
+                    zoneDefInfo.get(z).defDrone.clear();
+                    //System.err.println(""+this.getClass().getSimpleName()+" Att drones " + attDrones);
+
+                }
+
+            }
+            ownedPrev.put(z, z.owner == _me);
+        }
+
+//        List<RZoneDrone> defDrones = rzdStruct.stream().filter(e -> zoneDefInfo.get( e.z).defDrone.contains(e.d))
+//                    .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());        
+//        
+    }    
+    
+   public void attackOpportunist(List<Drone> attDrones,HashSet<Drone> inuseDrones, HashSet<Drone> lockedDrones) {
+
+        HashMap<Zone, ThreatLevel> threat = _buildRZoneDrone().setDistanceCalc().getThreat(e -> true);
+        int DronePerPlanet=2;
+
+        for (PlayerAI p : _player) {
+            if (p == _me) {
+                continue;
+            }
+            ///-------------- Classer les defenseurs en free / stuck / retreat
+            HashSet<Drone> freeDrone = new HashSet<>();
+            HashSet<Drone> stuckDrone = new HashSet<>();
+            HashSet<Drone> retreatDrone = new HashSet<>();
+
+            List<Drone> currAttaque = new ArrayList<>(D);
+
+            for (Zone z : _zone) {
+
+                currAttaque.clear();
+                if (!(z.owner == p || z.owner == _nullPlayer)) {
+                    continue;
+                }
+
+                int[] maxThreat = threat.get(z).getMaxThreat(_me);
+
+                //System.err.println("" + z + "\n" + threat.get(z));
+                //System.err.println("maxthreat[] " + arrayToString(maxThreat));
+                List<RZoneDrone> defDrones = _buildRZoneDrone().stream().filter(e -> e.d.owner == _me && e.z == z && attDrones.contains(e.d) && !inuseDrones.contains(e.d))
+                        .sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());
+                int nbDrone = attDrones.stream().filter((e) -> !inuseDrones.contains(e)).collect(Collectors.toList()).size();
+                int nbDroneLeft = nbDrone;
+                for (RZoneDrone rzd : defDrones) {
+                    int nbUsed = nbDrone - nbDroneLeft;
+                    Drone d = rzd.d;
+                    int level = rzd.level;
+                    if (level >= maxThreat.length - 1) {
+                        break;
+                    }
+                    int currLevelCp = maxThreat[level];
+                    currAttaque.add(d);
+
+                    //System.err.println("Considering " + rzd.d + " at " + z + " level " + rzd.level + " knowing " + currLevelCp + "/ Left " + nbDroneLeft + " used " + nbUsed);
+                    if (currLevelCp < currAttaque.size() && currLevelCp <= DronePerPlanet) {
+                        //System.err.println("Defense is breaking : attack drones "+currAttaque);
+
+                        //System.err.println("" + this.getClass().getSimpleName() + " " + "Attack " + z + " with " + currAttaque + " at " + z.cor);
+                        for (Drone atd : currAttaque) {
+                            _order.get(atd).set(z.cor);
+                            inuseDrones.add(atd);
+
+                        }
+
+                        break;
+                    }
+                }
+            }// fin zone            
+
+        }
+    }    
 
     @Override
     public List<L0_2dLib.Point> outorders() {
@@ -288,7 +437,7 @@ public class TestL2_Bibot_P2_V1_1 extends L1_botStruct.BotBase {
         HashSet<Drone> inuseDrones = new HashSet<>();
         HashSet<RZoneZone> marked = new HashSet<>();
 
-        doSimpleOrder();
+        doSimpleOrder(inuseDrones);
 
         return super.outorders(); //To change body of generated methods, choose Tools | Templates.
     }
@@ -300,6 +449,9 @@ public class TestL2_Bibot_P2_V1_1 extends L1_botStruct.BotBase {
         outputText("" + geom);
 
         plan.init();
+        rzdStruct = _buildRZoneDrone();
+        
+        attackOpportunist(attDrones, new HashSet<>(), new HashSet<>());
     }
 
     @Override
