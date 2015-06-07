@@ -3,6 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
 
+P2_3
+  First world concept.
+  bigroups (2 W defense).
+
 V2_6 objectifs :
 - Attaque par anticipation
 - Clouage
