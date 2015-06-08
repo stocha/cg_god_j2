@@ -19,6 +19,7 @@ import L1_bots.TestL2_BiBot_V1_1_N_1_1;
 import L1_bots.TestL2_Bi_P2_A_Explode3;
 import L1_bots.TestL2_Bi_P2_OnduleV2;
 import L1_bots.TestL2_Bibot_P2_V1_1;
+import L1_bots.TestL2_Bibot_P2_V1_2;
 import world.WorldBase;
 import static world.WorldVisu.create;
 
@@ -79,8 +80,10 @@ public class TestScenarios {
    public static void testV2Off(){
        
        //TestL2_BiBot_V1_1_N_1_1
-       
- WorldBase w=new WorldBase(3, 4, 9966666,false, new TesterBot(TestL2_Bi_P2_A_Explode3.fact),  new TesterBot(TestL2_Bibot_P2_V1_1.fact)); // 1 vs 1                    
+   
+       WorldBase w=new WorldBase(3, 4, 9966666,false, new TesterBot(TestL2_Bibot_P2_V1_2.fact),  new TesterBot(TestL1_OffenseV2_4.fact)); // 1 vs 1                           
+//WorldBase w=new WorldBase(3, 8, 9966666,true, new TesterBot(TestL2_Bibot_P2_V1_2.fact),  new TesterBot(TestL2_Bibot_P2_V1_2.fact),  new TesterBot(TestL2_Bibot_P2_V1_2.fact),  new TesterBot(TestL2_Bibot_P2_V1_2.fact)); // 1 vs 1                           
+ //WorldBase w=new WorldBase(3, 4, 9966666,true, new TesterBot(TestL2_Bi_P2_A_Explode3.fact),  new TesterBot(TestL2_Bibot_P2_V1_2.fact)); // 1 vs 1                    
        
 //      WorldBase w=new WorldBase(3, 4, 9966666,true,  new TesterBot(TestL1_OffenseV2_4.fact), new TesterBot(TestL2_Bi_P2_A_Explode3.fact)); // 1 vs 1             
 //WorldBase w=new WorldBase(3, 4, 9966666,true,  new TesterBot(TestL2_Bibot_P2_V1_1.fact), new TesterBot(TestL2_Bi_P2_OnduleV2.fact)); // 1 vs 1             

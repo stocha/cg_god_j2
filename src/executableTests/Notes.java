@@ -12,7 +12,10 @@ V2_6 objectifs :
 - Clouage
 
 
-
+Refactoring : 
+    Zone + defend + attack ==> 
+- freeDefend / freeAttacks / urgentDefend / urgentAttack / stepDefend / stepAttack
+- Binding attDrone/defDrone /   (+ (free / urgent / limit) ?? )
 
 
 
