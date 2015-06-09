@@ -22,6 +22,40 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase {
     public TestL2_Bibot_P2_V1_2(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
     }
+    
+    public class HypCalc{
+        public class DroneLevel{
+            final Drone d;
+            final int l;
+
+            public DroneLevel(Drone d, int l) {
+                this.d = d;
+                this.l = l;
+            }                        
+        }
+        
+        public class Binding{
+            Drone under;
+            Drone top;
+            int leveldif;
+            boolean underCapture;
+            boolean captureConflict;
+        
+        }
+    
+        /**
+         * 
+         * @param target
+         * @param p1 non empty
+         * @param p2 non empty (define player)
+         * @return 
+         */
+        List<Binding> calcBinding(Zone target,List<DroneLevel> p1,List<DroneLevel> p2){
+            List<Binding> res=new ArrayList<>(D);
+            
+            return res;
+        }
+    }
 
     public static L1_botStruct.BotFactory fact = (int P1, int Id1, int D1, int Z1) -> new TestL2_Bibot_P2_V1_2(P1, Id1, D1, Z1);
 
