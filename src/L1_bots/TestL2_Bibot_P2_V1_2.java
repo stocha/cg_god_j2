@@ -25,8 +25,8 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
         super(P, Id, D, Z);
     }
     
-    public class HypCalc{
-        public class DroneLevel implements Comparable<DroneLevel>{
+    public static class HypCalc{
+        public static class DroneLevel implements Comparable<DroneLevel>{
             final Drone d;
             final int l;
 
@@ -41,7 +41,7 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
             }
         }
         
-        public class Binding{
+        public static class Binding{
             DroneLevel under;
             DroneLevel top;
             int leveldif;
@@ -59,8 +59,8 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
          * @param p2 non empty (define player)
          * @return 
          */
-        List<Binding> calcBinding(Zone target,List<DroneLevel> p1,List<DroneLevel> p2){
-            List<Binding> res=new ArrayList<>(D);
+        public final static List<Binding> calcBinding(Zone target,List<DroneLevel> p1,List<DroneLevel> p2){
+            List<Binding> res=new ArrayList<>(20);
             
             Collections.sort(p1);
             Collections.sort(p2);
