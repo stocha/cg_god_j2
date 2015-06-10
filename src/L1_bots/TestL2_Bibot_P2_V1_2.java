@@ -8,8 +8,10 @@ package L1_bots;
 
 import L0_tools.L0_2dLib;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,14 +19,14 @@ import java.util.stream.Collectors;
  *
  * @author Jahan
  */
-public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase {
+public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
 
     public TestL2_Bibot_P2_V1_2(int P, int Id, int D, int Z) {
         super(P, Id, D, Z);
     }
     
     public class HypCalc{
-        public class DroneLevel{
+        public class DroneLevel implements Comparable<DroneLevel>{
             final Drone d;
             final int l;
 
@@ -32,16 +34,23 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase {
                 this.d = d;
                 this.l = l;
             }                        
+
+            @Override
+            public int compareTo(DroneLevel t) {
+                return t.l-this.l;
+            }
         }
         
         public class Binding{
-            Drone under;
-            Drone top;
+            DroneLevel under;
+            DroneLevel top;
             int leveldif;
             boolean underCapture;
             boolean captureConflict;
         
         }
+        
+        
     
         /**
          * 
@@ -52,6 +61,141 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase {
          */
         List<Binding> calcBinding(Zone target,List<DroneLevel> p1,List<DroneLevel> p2){
             List<Binding> res=new ArrayList<>(D);
+            
+            Collections.sort(p1);
+            Collections.sort(p2);
+            
+            PlayerAI own=target.owner;
+            PlayerAI pp1=p1.get(0).d.owner;
+            PlayerAI pp2=p2.get(0).d.owner;
+            
+            boolean end=false;
+            
+            Iterator<DroneLevel> a=p1.iterator();
+            Iterator<DroneLevel> b=p2.iterator();
+            
+            DroneLevel ca=a.next();
+            DroneLevel cb=a.next();
+            
+            while(!end){
+                Binding bind=new Binding();                        
+                
+                int comp=ca.compareTo(cb);
+                if(comp==0){
+                    if(ca.d.owner!=own && cb.d.owner!=own){
+                        bind.top=cb;
+                        bind.under=ca;
+                        bind.captureConflict=true;
+                        bind.leveldif=comp;
+                        bind.underCapture=false;
+                    }else if(ca.d.owner==own){
+                        bind.top=cb;
+                        bind.under=ca;
+                        bind.captureConflict=false;
+                        bind.leveldif=comp;
+                        bind.underCapture=false;                        
+                    
+                    }else{
+                        bind.top=ca;
+                        bind.under=cb;
+                        bind.captureConflict=false;
+                        bind.leveldif=comp;
+                        bind.underCapture=false;                              
+                    }
+                    
+                    
+                }
+                else if(comp>0){ // ca plus bas que cb
+                    if(ca.d.owner!=own && cb.d.owner!=own){
+                        bind.top=cb;
+                        bind.under=ca;
+                        bind.captureConflict=false;
+                        bind.leveldif=comp;
+                        bind.underCapture=true;
+                        own=ca.d.owner;
+                    }else if(ca.d.owner==own){
+                        bind.top=cb;
+                        bind.under=ca;
+                        bind.captureConflict=false;
+                        bind.leveldif=comp;
+                        bind.underCapture=false;                        
+                    
+                    }else{
+                        bind.top=cb;
+                        bind.under=ca;
+                        bind.captureConflict=false;
+                        bind.leveldif=comp;
+                        bind.underCapture=true;     
+                        own=ca.d.owner;
+                    }                    
+                    
+                }else if(comp<0){
+                    if(ca.d.owner!=own && cb.d.owner!=own){
+                        bind.top=ca;
+                        bind.under=cb;
+                        bind.captureConflict=false;
+                        bind.leveldif=-comp;
+                        bind.underCapture=true;
+                        own=cb.d.owner;
+                    }else if(cb.d.owner==own){
+                        bind.top=ca;
+                        bind.under=cb;
+                        bind.captureConflict=false;
+                        bind.leveldif=-comp;
+                        bind.underCapture=false;                        
+                    
+                    }else{
+                        bind.top=ca;
+                        bind.under=cb;
+                        bind.captureConflict=false;
+                        bind.leveldif=-comp;
+                        bind.underCapture=true;  
+                        own=cb.d.owner;
+                    }                       
+                    
+                }
+                res.add(bind);
+                
+                
+                if(!a.hasNext()||!b.hasNext()) {
+                    if(a.hasNext()==b.hasNext()) return res;
+                    if(a.hasNext()){
+                        ca=a.next();
+                        
+                        Binding bindfin=new Binding();
+                        bind.top=null;
+                        bind.under=ca;
+                        bind.captureConflict=false;
+                        bind.leveldif=cb.compareTo(ca);
+                        
+                        if(own!=ca.d.owner)
+                            bind.underCapture=true;           
+                        else
+                            bind.underCapture=false;           
+                        
+                        res.add(bindfin);
+                    }else{
+                        cb=b.next();
+                        
+                        Binding bindfin=new Binding();
+                        bind.top=null;
+                        bind.under=cb;
+                        bind.captureConflict=false;
+                        bind.leveldif=ca.compareTo(cb);
+                        
+                        if(own!=cb.d.owner)
+                            bind.underCapture=true;           
+                        else
+                            bind.underCapture=false;           
+                        
+                        res.add(bindfin);                        
+                    }
+                    
+                    break;
+                }
+                ca=a.next();
+                cb=b.next();
+            }
             
             return res;
         }
