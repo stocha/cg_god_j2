@@ -37,8 +37,15 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
 
             @Override
             public int compareTo(DroneLevel t) {
-                return t.l-this.l;
+                return -t.l+this.l;
             }
+
+            @Override
+            public String toString() {
+                return "DroneLevel{" + "d=" + d + ", l=" + l + '}';
+            }
+            
+            
         }
         
         public static class Binding{
@@ -47,7 +54,14 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
             int leveldif;
             boolean underCapture;
             boolean captureConflict;
+
+            @Override
+            public String toString() {
+                return "Binding{" + "under=" + under + ", top=" + top + ", leveldif=" + leveldif + ", underCapture=" + underCapture + ", captureConflict=" + captureConflict + '}';
+            }
         
+            
+            
         }
         
         
@@ -105,7 +119,7 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
                     
                     
                 }
-                else if(comp>0){ // ca plus bas que cb
+                else if(comp<0){ // ca plus bas que cb
                     if(ca.d.owner!=own && cb.d.owner!=own){
                         bind.top=cb;
                         bind.under=ca;
@@ -129,7 +143,7 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
                         own=ca.d.owner;
                     }                    
                     
-                }else if(comp<0){
+                }else if(comp>0){
                     if(ca.d.owner!=own && cb.d.owner!=own){
                         bind.top=ca;
                         bind.under=cb;
