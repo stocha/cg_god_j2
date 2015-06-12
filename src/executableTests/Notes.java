@@ -17,7 +17,8 @@ Refactoring :
 - freeDefend / freeAttacks / urgentDefend / urgentAttack / stepDefend / stepAttack
 - Binding attDrone/defDrone /   (+ (free / urgent / limit) ?? )
 
-
++++++++
+V1_2 : attention si monde neutre, alors defense blocked necessaire !
 
 
 -------------------------------------------------------------------------------------------

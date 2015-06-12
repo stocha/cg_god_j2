@@ -244,15 +244,94 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
         }        
     }    
     
+    public List<HypCalc.Binding> calcBinding(List<Drone> a, List<Drone> b, Zone it){
+        List<HypCalc.DroneLevel> la=new ArrayList<>(a.size());
+        List<HypCalc.DroneLevel> lb=new ArrayList<>(b.size());
+        
+        for(Drone d : a){
+            la.add(new HypCalc.DroneLevel(d,(int) (d.dist(it)-1) /100));
+        }
+        for(Drone d : b){
+            lb.add(new HypCalc.DroneLevel(d,(int) (d.dist(it)-1) /100));
+        }        
+        
+        return HypCalc.calcBinding(it, la, lb);
+        
+    }
+    
+    public int levelCapture(List<HypCalc.Binding> bind){
+        for(HypCalc.Binding b : bind){
+            if(b.under.d.owner==_me && b.underCapture){
+                return b.under.l;
+            
+            }
+        
+        }
+        return -1;
+    }
+    
+    public HypCalc.DroneLevel findMine(HypCalc.Binding b){
+        if(b.under.d.owner==_me) return b.under;
+        
+        if(b.top==null) return null;
+        return b.top;
+    }
+    
     List<Zone> firstZone=new ArrayList<>();
     public boolean openingStratDone(){
         if(firstZone.size()==0 ){
-           firstZone.add( _buildRZoneDrone().setDistanceCalc().stream().filter(e->e.d.owner==_me).sorted(comp_rzd_byLevel.reversed()).findFirst().get().z);             
+            List<RZoneDrone> lz=_buildRZoneDrone().setDistanceCalc().stream().filter(e->e.d.owner==_me).sorted(comp_rzd_byLevel.reversed()).collect(Collectors.toList());            
+           firstZone.add(lz.get(0).z );             
+           for(RZoneZone rzd : _buildRZoneZone().setDistance().stream().filter(e->e.a==firstZone.get(0) || e.b==firstZone.get(0)).sorted(comp_zz_bydist.reversed()).collect(Collectors.toList())){
+               if(rzd.a==firstZone.get(0)){
+                   firstZone.add(rzd.b);
+                   break;
+               }else{
+                   firstZone.add(rzd.a);
+                   break;                   
+               }
+               
+           }
         }
         
-        for(Drone d : _drone.get(_me)){
-            _order.get(d).set(firstZone.get(0));
+        List<HypCalc.Binding> bind=calcBinding(_drone.get(_me), _drone.get(_player.get(_me.id^1)), firstZone.get(0));
+        
+        //HashSet<Drone> done
+        if(firstZone.get(0).owner!=_me){
+            int lvlcapt=levelCapture(bind);
+            if(lvlcapt==-1){
+                for(HypCalc.Binding b : bind){
+                    Drone myd=findMine(b).d;
+                    if(myd!=null){
+                        _order.get(myd).set(firstZone.get(0));
+                    }
+                } 
+            }else{
+                boolean doneAtt=false;
+                
+                for(HypCalc.Binding b : bind){
+                    HypCalc.DroneLevel myd=findMine(b);        
+                    if(myd==null) break;
+                    if(doneAtt){
+                        if(myd!=null){
+                            _order.get(myd.d).set(firstZone.get(1));
+                        }                    
+                        continue;
+                    }
+                    
+
+                    if(myd.l>=lvlcapt-1 ||b.captureConflict){
+                        _order.get(myd.d).set(firstZone.get(0));
+                    }else{
+                        _order.get(myd.d).set(firstZone.get(1));
+                    }
+                    if(b.underCapture) doneAtt=true;
+                }             
+            
+            }
+           
         }
+
 
         
         return false;
