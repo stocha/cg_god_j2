@@ -54,9 +54,9 @@ public class TestL2_Bibot_P2_V1_2_test {
          List<TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel> p2=new ArrayList<>();
          
          p1.add(new TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel(bot.new Drone(pa,0), 0));
+         p1.add(new TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel(bot.new Drone(pa,3), 7));         
          p1.add(new TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel(bot.new Drone(pa,1), 3));
          p1.add(new TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel(bot.new Drone(pa,2), 7));
-         p1.add(new TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel(bot.new Drone(pa,3), 7));
          p1.add(new TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel(bot.new Drone(pa,4), 8));
          
          p2.add(new TestL2_Bibot_P2_V1_2.HypCalc.DroneLevel(bot.new Drone(pb,0), 0));

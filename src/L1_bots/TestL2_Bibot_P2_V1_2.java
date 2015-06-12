@@ -77,7 +77,7 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
             List<Binding> res=new ArrayList<>(20);
             
             Collections.sort(p1);
-            Collections.sort(p2);
+            Collections.sort(p2);            
             
             PlayerAI own=target.owner;
             PlayerAI pp1=p1.get(0).d.owner;
@@ -89,7 +89,7 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
             Iterator<DroneLevel> b=p2.iterator();
             
             DroneLevel ca=a.next();
-            DroneLevel cb=a.next();
+            DroneLevel cb=b.next();
             
             while(!end){
                 Binding bind=new Binding();                        
@@ -124,21 +124,21 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
                         bind.top=cb;
                         bind.under=ca;
                         bind.captureConflict=false;
-                        bind.leveldif=comp;
+                        bind.leveldif=-comp;
                         bind.underCapture=true;
                         own=ca.d.owner;
                     }else if(ca.d.owner==own){
                         bind.top=cb;
                         bind.under=ca;
                         bind.captureConflict=false;
-                        bind.leveldif=comp;
+                        bind.leveldif=-comp;
                         bind.underCapture=false;                        
                     
                     }else{
                         bind.top=cb;
                         bind.under=ca;
                         bind.captureConflict=false;
-                        bind.leveldif=comp;
+                        bind.leveldif=-comp;
                         bind.underCapture=true;     
                         own=ca.d.owner;
                     }                    
@@ -148,21 +148,21 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
                         bind.top=ca;
                         bind.under=cb;
                         bind.captureConflict=false;
-                        bind.leveldif=-comp;
+                        bind.leveldif=comp;
                         bind.underCapture=true;
                         own=cb.d.owner;
                     }else if(cb.d.owner==own){
                         bind.top=ca;
                         bind.under=cb;
                         bind.captureConflict=false;
-                        bind.leveldif=-comp;
+                        bind.leveldif=comp;
                         bind.underCapture=false;                        
                     
                     }else{
                         bind.top=ca;
                         bind.under=cb;
                         bind.captureConflict=false;
-                        bind.leveldif=-comp;
+                        bind.leveldif=comp;
                         bind.underCapture=true;  
                         own=cb.d.owner;
                     }                       
