@@ -168,8 +168,9 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
                     }                       
                     
                 }
+                if(bind.top==null || bind.under ==null) throw new RuntimeException("invariation invalide");
                 res.add(bind);
-                
+                bind=null;
                 
                 if(!a.hasNext()||!b.hasNext()) {
                     if(a.hasNext()==b.hasNext()) return res;
@@ -177,35 +178,35 @@ public class TestL2_Bibot_P2_V1_2 extends L1_botStruct.BotBase{
                         ca=a.next();
                         
                         Binding bindfin=new Binding();
-                        bind.top=null;
-                        bind.under=ca;
-                        bind.captureConflict=false;
-                        bind.leveldif=cb.compareTo(ca);
+                        bindfin.top=null;
+                        bindfin.under=ca;
+                        bindfin.captureConflict=false;
+                        bindfin.leveldif=ca.compareTo(cb);
                         
                         if(own!=ca.d.owner)
-                            bind.underCapture=true;           
+                            bindfin.underCapture=true;           
                         else
-                            bind.underCapture=false;           
+                            bindfin.underCapture=false;           
                         
                         res.add(bindfin);
                     }else{
                         cb=b.next();
                         
                         Binding bindfin=new Binding();
-                        bind.top=null;
-                        bind.under=cb;
-                        bind.captureConflict=false;
-                        bind.leveldif=ca.compareTo(cb);
+                        bindfin.top=null;
+                        bindfin.under=cb;
+                        bindfin.captureConflict=false;
+                        bindfin.leveldif=cb.compareTo(ca);
                         
                         if(own!=cb.d.owner)
-                            bind.underCapture=true;           
+                            bindfin.underCapture=true;           
                         else
-                            bind.underCapture=false;           
+                            bindfin.underCapture=false;           
                         
                         res.add(bindfin);                        
                     }
-                    
-                    break;
+                    //System.out.println("returning asymetric "+res);
+                    return res;
                 }
                 ca=a.next();
                 cb=b.next();

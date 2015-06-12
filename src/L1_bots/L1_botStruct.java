@@ -385,7 +385,7 @@ public class L1_botStruct {
 
             final int id;
             final L0_2dLib.Point cor;
-            PlayerAI owner;
+            public PlayerAI owner;
 
             public Zone(int id, PlayerAI owner) {
                 this.id = id;
