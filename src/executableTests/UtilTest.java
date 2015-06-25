@@ -36,5 +36,36 @@ public class UtilTest {
     public static int convHexByte(char a,char b){
         return (convHalfByte(a)*16)+convHalfByte(b);
         
-    }    
+    }  
+    
+    static final byte[] dat=new byte[]{0x13,0x72};
+    
+    public static String fromByteArrayToString(byte[] data,int perline){
+        String res="\"";
+        int lc=0;
+        for(byte b : data){
+            res+=""+convHexByte(b&255);
+            res+="";
+            lc++;
+            
+            if(lc>=perline){
+                lc=0;
+                res+="\"+\n\"";
+            }
+        }
+        res+="\"";
+        return res;
+    }
+    
+    public static byte[] fromStringToByteArray(String in){
+        byte[] res=new byte[in.length()/2];
+        for(int i=0;i<res.length;i++){
+            char a=in.charAt(i*2);
+            char b=in.charAt(i*2+1);
+            
+            res[i]=(byte)convHexByte(a, b);
+        }
+        
+        return res;
+    }
 }

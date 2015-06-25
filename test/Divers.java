@@ -5,6 +5,7 @@
  */
 
 import executableTests.UtilTest;
+import java.util.Arrays;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -41,7 +42,7 @@ public class Divers {
     // The methods must be annotated with annotation @Test. For example:
     //
      @Test
-     public void hello() {
+     public void testConvertHex() {
          assertEquals(UtilTest.convHexByte('0', '3'),3);              
          assertEquals(UtilTest.convHexByte('F', 'F'),255);
          assertEquals(UtilTest.convHexByte('F', 'E'),254);
@@ -62,4 +63,33 @@ public class Divers {
          assertEquals(""+UtilTest.convHexByte(3),"03");
      
      }
+     
+     @Test
+     public void testConvertByteJava() {
+         
+//         System.out.println(""+UtilTest.fromByteArrayToString(new byte[]{(byte)0xFF,(byte)0x00,
+//         (byte)0x7F,(byte)0x01
+//         }, 2)
+//         );
+         assertEquals(
+                 UtilTest.fromByteArrayToString(new byte[]{(byte)0xFF,(byte)0x00,
+         (byte)0x7F,(byte)0x01
+         }, 2),"\"FF00\"+\n\"7F01\"+\n\"\""
+         );     
+         
+         byte[] it=new byte[]{(byte)0xFF,(byte)0x00,
+         (byte)0x7F,(byte)0x01
+         };
+         
+         assertEquals(Arrays.equals(it,UtilTest.fromStringToByteArray("FF007F01")),true);
+         
+         System.out.println(""+Arrays.toString(it));
+     
+     }     
+     
+     @Test
+     public void testTruc() {
+         byte[] toto=new byte[]{0x12,0x13,0x01};
+     
+     }     
 }
